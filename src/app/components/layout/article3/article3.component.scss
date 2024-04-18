@@ -1,0 +1,136 @@
+/* ARTICLE No. 3 SCSS */
+
+$border3: var(--border3);
+$headline2: var(--headline2);
+$buttons: var(--buttons);
+
+article.article_no3 {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+  background-color: white;
+  padding: 6rem 0 6rem 0;
+
+  .headlines {
+    text-align: center;
+
+    h2 {
+      font-size: 38px;
+    }
+
+    p {
+      font-size: 16px;
+    }
+  }
+
+  .case {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10rem 0 10rem;
+
+    img {
+      width: 50rem;
+      height: auto;
+      min-width: 20rem;
+      border-radius: 8px;
+    }
+
+    .description_case {
+      border: 0.5px solid $border3;
+      border-radius: 5px;
+      padding: 2.5rem;
+      color: $headline2;
+      width: 40rem;
+      margin-left: -2.5rem;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      justify-content: center;
+      align-items: flex-start;
+      margin-top: 0;
+      max-width: 100rem;
+      min-width: 16rem;
+
+      h3 {
+        font-size: 22px;
+        font-family: "Poppins", "Roboto", system-ui;
+        font-weight: 500;
+        letter-spacing: 1.5px;
+      }
+
+      p {
+        font-size: 22px;
+        font-family: "Mulish", "Roboto", system-ui;
+        margin-bottom: 1.25rem;
+        font-weight: 350;
+      }
+
+      a {
+        color: $buttons;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        font-family: "Poppins", "Roboto", system-ui;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1694px) {
+    .case .description_case {
+      margin-top: -2.5rem;
+      max-width: 60%;
+      margin-left: 0;
+    }
+  }
+
+  nav,
+  nav .indice {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.75rem;
+    cursor: pointer;
+
+    i {
+      color: #7a869a;
+      background-color: #f4f5f7;
+      border-radius: 50px;
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .indice {
+      gap: 0.3rem;
+      list-style: none;
+    }
+  }
+
+  .selected,
+  .not_selected {
+    background-color: $buttons;
+  }
+
+  // .not_selected {
+  //   background-color: $buttons;
+  //   opacity: 0.6;
+  //   padding: 0.4rem;
+  //   border-radius: 20px;
+  //   transition: all 0.3s ease 0s;
+  // }
+
+  // .selected {
+  //   background-color: $buttons;
+  //   padding: 0.4rem 2.4rem 0.4rem 0.4rem;
+  //   border-radius: 20px;
+  //   opacity: 1;
+  //   transition: all 0.3s ease 0s;
+  // }
+}

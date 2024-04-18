@@ -1,0 +1,46 @@
+<article class="article_no3">
+  <div class="headlines">
+    <h2 class="headline">Casos de éxito</h2>
+    <p class="2headline">
+      Descubre cómo nuestra plataforma se adapta a diferentes situaciones
+      profesionales y personales para mejorar tu productividad en cualquier
+      contexto.
+    </p>
+  </div>
+
+  <section class="case">
+    <img
+      class="image_case"
+      [src]="CASES[indexCase].src"
+      [alt]="'IMG Case ' + CASES[indexCase].title"
+    />
+    <div class="description_case">
+      <h3>{{ CASES[indexCase].title }}</h3>
+      <p>{{ CASES[indexCase].paragraph }}</p>
+      <a> Descubre cómo<i class="fa-solid fa-arrow-right"></i> </a>
+    </div>
+  </section>
+
+  <nav>
+    <i
+      data-key="back"
+      class="fa-solid fa-chevron-left"
+      (click)="handleClick($event)"
+    ></i>
+    <ul class="indice">
+      <li
+        *ngFor="let clase of claseSelected; let i = index"
+        [ngClass]="clase"
+        [attr.key]="i"
+        [attr.data-key]="i"
+        (click)="handleClick($event)"
+        [@animacionHover]="clase"
+      ></li>
+    </ul>
+    <i
+      data-key="next"
+      class="fa-solid fa-chevron-right"
+      (click)="handleClick($event)"
+    ></i>
+  </nav>
+</article>

@@ -1,0 +1,128 @@
+/*ARTICLE No. 1 CSS*/
+article.articile_no1 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  gap: 2rem;
+  padding: 6rem 3rem 6rem 3rem;
+
+  section.left {
+    display: flex;
+    width: 45%;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    height: 100%;
+    gap: 1.5rem;
+
+    .register {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      font-family: "Poppins", "Roboto", system-ui;
+      flex-wrap: wrap;
+
+      button {
+        padding: 12px;
+        font-family: "Mulish", "Roboto", system-ui;
+        flex-grow: 1;
+        border: none;
+        background-color: #2563eb;
+        border-radius: 7px;
+        color: #fff;
+        display: flex;
+        gap: 3rem;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 16px;
+        letter-spacing: 0.5px;
+      }
+
+      .input-container {
+        flex-grow: 6;
+        position: relative;
+
+        input {
+          padding: 15px 0 15px 0;
+          border-radius: 7px;
+          border: var(--border) 1px solid;
+          width: 100%;
+          padding: 12px 31px;
+          font-weight: 300;
+          font-family: "Mulish", "Roboto", system-ui;
+          color: var(--headline2);
+          font-size: 16px;
+        }
+
+        label {
+          position: absolute;
+          top: 0;
+          left: 0;
+          padding: 12px;
+          pointer-events: none;
+        }
+
+        i {
+          margin-right: 5px;
+          color: var(--headline2);
+        }
+      }
+    }
+    .logos {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-items: center;
+      background-color: var(--logos_background);
+      color: var(--logos_color);
+      border-radius: 10px;
+      padding: 0.5rem;
+      gap: 0.5rem;
+
+      a {
+        text-decoration: none;
+        color: var(--logos_color);
+      }
+
+      .belenLogo {
+        width: 35px;
+        height: auto;
+      }
+    }
+
+    .logos > * {
+      display: flex;
+      place-items: center;
+      font-size: 18px;
+      font-family: "Poppins", "Roboto", system-ui;
+      font-weight: 600;
+      gap: 5px;
+      letter-spacing: -0.5px;
+
+      .logo {
+        font-size: 25px;
+        width: 25px;
+        height: auto;
+      }
+    }
+  }
+
+  section.right {
+    display: flex;
+    place-items: center;
+    height: 100%;
+    width: 55rem;
+
+    .tablero {
+      width: 100%;
+      height: auto;
+    }
+  }
+}

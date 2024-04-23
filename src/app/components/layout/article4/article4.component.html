@@ -1,0 +1,56 @@
+<article class="article_no4">
+  <section class="content">
+    <div class="left">
+      <header class="headlines">
+        <h2 class="headline">¿Preguntas?</h2>
+        <h2 class="headline2">Respuestas.</h2>
+        <p class="headline3">Las respuestas a tus preguntas mas frecuentes</p>
+      </header>
+      <div class="features">
+        <div class="item">
+          <i class="fa-solid fa-check"></i>
+          <div class="title">
+            <h3>Te ayudamos</h3>
+            <p>
+              Accede a las respuestas de las dudas mas frecuentes de nuestros
+              usuarios.
+            </p>
+          </div>
+        </div>
+        <div class="item">
+          <i class="fa-solid fa-check"></i>
+          <div class="title">
+            <h3>Ayuda en tiempo real</h3>
+            <p>
+              Si las preguntas frecuentes no han resuelto tus dudas,
+              contáctanos.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <ul class="questions">
+        <li
+          *ngFor="let question of randomQuestions; let i = index"
+          class="question"
+          [attr.key]="i"
+        >
+          <div class="title" (click)="handleClick(i)">
+            <h3>{{ question.question }}</h3>
+            <i
+              class="{{
+                indexQuestion === i
+                  ? 'fa-solid fa-chevron-right -right'
+                  : 'fa-solid fa-chevron-right -down'
+              }}"
+            ></i>
+          </div>
+          <p *ngIf="indexQuestion === i" class="answer">
+            {{ question.answer }}
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+</article>

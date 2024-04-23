@@ -57,9 +57,9 @@ const FAQs = [
     answer:
       'Actualmente, Flowboard está disponible como una aplicación web. Estamos trabajando en una versión para equipos que estará disponible próximamente.',
   },
-]
+];
 
 export function get4RandomQuestions() {
-  const startIndex = Math.floor(Math.random() * (FAQs.length - 3))
-  return FAQs.slice(startIndex, startIndex + 4)
+  const startIndex = Math.floor(Math.random() * (FAQs.length - 3));
+  return FAQs.slice(startIndex, startIndex + 4);
 }

@@ -1,0 +1,125 @@
+$background-color: #f8f9ff;
+$contborder: #e5f4f2;
+$buttons_color: #2563eb;
+$info: #0f172a;
+
+article.articile_no5 {
+  background-color: $background-color;
+  .contenedor {
+    width: 90%;
+    max-width: 200rem;
+    margin: 6rem;
+
+    border-radius: 20px;
+    border: 1.5px solid $contborder;
+  }
+
+  .contact_container {
+    width: 80%;
+
+    .contactinfo {
+      i {
+        color: $buttons_color;
+        font-size: 18px;
+      }
+
+      p {
+        font-family: "Mulish", "Roboto", system-ui;
+        font-size: 16px;
+        color: $info;
+      }
+    }
+
+    .redes {
+      h3 {
+        color: $info;
+        font-family: "Poppins", "Roboto", system-ui;
+        font-size: 21px;
+      }
+
+      i {
+        font-size: 18px;
+        color: $info;
+        padding: 7px;
+        display: flex;
+        font-weight: bold;
+        align-items: center;
+        justify-content: center;
+        border-radius: 100%;
+        background-color: $contborder;
+      }
+    }
+  }
+
+  .headlines {
+    h2 {
+      font-size: 56px;
+      line-height: 130%;
+      letter-spacing: -1px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 150%;
+    }
+  }
+
+  form {
+    width: 40%;
+
+    i {
+      color: $buttons_color;
+    }
+
+    button {
+      width: 50%;
+      background-color: $buttons_color;
+      color: white;
+      border: none;
+      border-radius: 15px;
+    }
+
+    .input-container {
+      position: relative;
+
+      input {
+        border-radius: 7px;
+        border: var(--border) 1px solid;
+        width: 100%;
+        padding: 12px 43px;
+        font-weight: 300;
+        font-family: "Mulish", "Roboto", system-ui;
+        color: var(--headline2);
+        font-size: 17px;
+      }
+
+      label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 15px;
+      }
+      i {
+        font-size: 18px;
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+      }
+
+      hr {
+        transform: rotate(0deg);
+        border-color: #dbe3ff;
+      }
+    }
+  }
+}
+
+::ng-deep .mat-mdc-form-field-flex,
+::ng-deep .mat-mdc-text-field-wrapper {
+  background: #fff;
+  border: none;
+  padding-right: 0;
+  fill: #fff;
+}

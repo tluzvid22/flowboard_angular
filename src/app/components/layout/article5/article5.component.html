@@ -1,0 +1,167 @@
+<article class="articile_no5 column full-center">
+  <div class="contenedor column p-2">
+    <header class="headlines mb-4">
+      <h2 class="headline">Contacto</h2>
+      <p class="headline2">
+        Contacta directamente con nosotros a través de nuestro correo
+        electrónico o teléfono.
+      </p>
+    </header>
+    <div class="contact_container row space-between">
+      <div class="contact column gap-2">
+        <div class="contactinfo column gap-1">
+          <div class="phone row gap-1 align-center">
+            <i class="fa-solid fa-phone-volume"></i>
+            <p>+34 656960916</p>
+          </div>
+          <div class="phone row gap-1 align-center">
+            <i class="fa-solid fa-envelope"></i>
+            <p>{{ "totoluzuriaga22@gmail.com" }}</p>
+          </div>
+        </div>
+        <div class="redes column gap-1">
+          <h3>Nuestras redes</h3>
+          <div class="row gap-1">
+            <i class="fa-brands fa-instagram"></i>
+            <i class="fa-brands fa-twitter"></i>
+            <i class="fa-solid fa-address-book"></i>
+            <i class="fa-solid fa-building-columns"></i>
+          </div>
+        </div>
+      </div>
+      <form
+        [formGroup]="contactForm"
+        #myFormDirective="ngForm"
+        (ngSubmit)="handleSubmit()"
+      >
+        <div *ngIf="formStep === 0" class="column gap-1">
+          <!-- <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="Correo electrónico"
+            />
+            <mat-icon matIconPrefix
+              ><i class="fa-regular fa-envelope"></i>
+            </mat-icon>
+
+            <mat-error
+              *ngIf="
+                contactForm.get('email')?.invalid &&
+                contactForm.get('email')?.touched
+              "
+              >Correo electrónico inválido.</mat-error
+            >
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Nombre</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="username"
+              placeholder="Nombre"
+              ngDefaultControl
+            />
+
+            <mat-icon matIconPrefix
+              ><i class="fa-regular fa-user"></i>
+            </mat-icon>
+
+            <mat-error
+              *ngIf="
+                contactForm.get('username')?.invalid &&
+                contactForm.get('username')?.touched
+              "
+              >Este campo es requerido.</mat-error
+            >
+          </mat-form-field> -->
+          <div class="input-container">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Email"
+            />
+            <label htmlFor="email">
+              <i class="fa-regular fa-envelope"><hr /></i>
+            </label>
+          </div>
+
+          <div class="input-container">
+            <input
+              type="text"
+              id="name"
+              formControlName="username"
+              placeholder="Nombre"
+            />
+            <label htmlFor="name">
+              <i class="fa-regular fa-user"><hr /></i>
+            </label>
+          </div>
+
+          <button (click)="nextStep()" class="full-center p-1 gap-1">
+            Siguiente
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div *ngIf="formStep === 1" class="column">
+          <!-- <mat-form-field>
+            <mat-label>Mensaje</mat-label>
+            <textarea
+              matInput
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="4"
+              type="text"
+              formControlName="message"
+              (keyup)="handleTextAreaChange($event)"
+              maxlength="200"
+            ></textarea>
+
+            <mat-error
+              *ngIf="
+                contactForm.get('email')?.invalid &&
+                contactForm.get('email')?.touched
+              "
+              >Correo electrónico inválido.</mat-error
+            >
+
+            <mat-error
+              *ngIf="
+                contactForm.get('message')?.touched &&
+                contactForm.get('message')?.errors?.required
+              "
+            >
+              Campo obligatorio</mat-error
+            ><mat-error
+              *ngIf="
+                contactForm.get('message')?.touched &&
+                contactForm.get('message')?.errors?.minlength
+              "
+            >
+              Mínimo 10 carácteres ({{ textAreaCharacters }}/10)</mat-error
+            ><mat-error
+              *ngIf="
+                contactForm.get('message')?.touched &&
+                contactForm.get('message')?.errors?.maxlength
+              "
+            >
+              Máximo 150 carácteres ({{ textAreaCharacters }}/150)</mat-error
+            >
+          </mat-form-field> -->
+          <button type="submit" class="full-center">Enviar</button>
+        </div>
+
+        <div *ngIf="formStep === 2" class="column full-center gap-1">
+          <h3>Recibido! Nuestro equipo te responderá lo más pronto posible</h3>
+          <button class="full-center" (click)="resetForm()">
+            Enviar otro mensaje
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</article>

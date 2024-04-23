@@ -29,12 +29,11 @@
     ></i>
     <ul class="indice">
       <li
-        *ngFor="let clase of claseSelected; let i = index"
-        [ngClass]="clase"
+        *ngFor="let case of CASES; let i = index"
+        [ngClass]="{ selected: i === indexCase, not_selected: i !== indexCase }"
         [attr.key]="i"
         [attr.data-key]="i"
         (click)="handleClick($event)"
-        [@animacionHover]="clase"
       ></li>
     </ul>
     <i

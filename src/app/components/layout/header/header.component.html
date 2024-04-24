@@ -14,7 +14,11 @@
     </div>
   </div>
   <div class="userBar">
-    <button class="loginBtn">Inicia sesión</button>
-    <button class="registerBtn">Regrístrate</button>
+    <button (click)="navigateTo('login')" class="loginBtn">
+      Inicia sesión
+    </button>
+    <button (click)="navigateTo('signup')" class="registerBtn">
+      Regrístrate
+    </button>
   </div>
 </header>

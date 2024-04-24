@@ -8,10 +8,11 @@ article.articile_no5 {
   .contenedor {
     width: 90%;
     max-width: 200rem;
-    margin: 6rem;
+    margin: 3.5rem;
 
     border-radius: 20px;
-    border: 1.5px solid $contborder;
+    border: 1px solid $contborder;
+    background-color: white;
   }
 
   .contact_container {
@@ -79,20 +80,36 @@ article.articile_no5 {
       color: white;
       border: none;
       border-radius: 15px;
+
+      i {
+        color: white;
+      }
     }
 
     .input-container {
       position: relative;
+      display: flex;
+      flex-direction: column;
 
-      input {
+      input,
+      textarea {
         border-radius: 7px;
         border: var(--border) 1px solid;
         width: 100%;
-        padding: 12px 43px;
+        padding: 12px;
         font-weight: 300;
         font-family: "Mulish", "Roboto", system-ui;
         color: var(--headline2);
         font-size: 17px;
+        resize: none;
+      }
+
+      input {
+        padding: 12px 45px;
+      }
+
+      textarea {
+        height: 7rem;
       }
 
       label {
@@ -105,12 +122,45 @@ article.articile_no5 {
         font-size: 18px;
         display: flex;
         flex-direction: row;
-        gap: 4px;
+        gap: 7px;
       }
 
       hr {
         transform: rotate(0deg);
         border-color: #dbe3ff;
+      }
+
+      .error {
+        margin-left: 6px;
+        color: red;
+        font-family: "Mulish", "Roboto", system-ui;
+        order: 2;
+        text-wrap: nowrap;
+      }
+
+      .error ~ input,
+      .error ~ textarea {
+        border-width: 2px;
+        outline-color: red;
+        outline: 2.5px solid red;
+        border: none;
+      }
+    }
+
+    .form_finished {
+      h3 {
+        font-size: 30px;
+        width: 90%;
+        color: var(--headline1);
+        text-align: center;
+      }
+
+      button {
+        background-color: $buttons_color;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        padding: 0.6rem;
       }
     }
   }

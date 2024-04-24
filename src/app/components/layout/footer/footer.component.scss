@@ -1,0 +1,22 @@
+$background-color: #2d2d2d;
+$socialbgnd: #4e4d4d;
+
+.wrapper {
+  background-color: $background-color;
+  color: white;
+  height: 4rem;
+
+  p {
+    font-size: 14px;
+    font-family: "Mulish", "Roboto", system-ui;
+    margin-left: 1rem;
+  }
+
+  .redes {
+    margin-right: 1rem;
+
+    i.fa-circle {
+      color: $socialbgnd;
+    }
+  }
+}

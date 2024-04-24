@@ -22,10 +22,10 @@
         <div class="redes column gap-1">
           <h3>Nuestras redes</h3>
           <div class="row gap-1">
-            <i class="fa-brands fa-instagram"></i>
-            <i class="fa-brands fa-twitter"></i>
-            <i class="fa-solid fa-address-book"></i>
-            <i class="fa-solid fa-building-columns"></i>
+            <i class="fa-brands fa-instagram clickable"></i>
+            <i class="fa-brands fa-twitter clickable"></i>
+            <i class="fa-solid fa-address-book clickable"></i>
+            <i class="fa-solid fa-building-columns clickable"></i>
           </div>
         </div>
       </div>
@@ -35,62 +35,16 @@
         (ngSubmit)="handleSubmit()"
       >
         <div *ngIf="formStep === 0" class="column gap-1">
-          <!-- <mat-form-field>
-            <mat-label>Email</mat-label>
-            <input
-              matInput
-              type="email"
-              formControlName="email"
-              placeholder="Correo electrónico"
-            />
-            <mat-icon matIconPrefix
-              ><i class="fa-regular fa-envelope"></i>
-            </mat-icon>
-
-            <mat-error
-              *ngIf="
-                contactForm.get('email')?.invalid &&
-                contactForm.get('email')?.touched
-              "
-              >Correo electrónico inválido.</mat-error
-            >
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Nombre</mat-label>
-            <input
-              matInput
-              type="text"
-              formControlName="username"
-              placeholder="Nombre"
-              ngDefaultControl
-            />
-
-            <mat-icon matIconPrefix
-              ><i class="fa-regular fa-user"></i>
-            </mat-icon>
-
-            <mat-error
+          <div class="input-container">
+            <div
+              class="error"
               *ngIf="
                 contactForm.get('username')?.invalid &&
                 contactForm.get('username')?.touched
               "
-              >Este campo es requerido.</mat-error
             >
-          </mat-form-field> -->
-          <div class="input-container">
-            <input
-              type="email"
-              id="email"
-              formControlName="email"
-              placeholder="Email"
-            />
-            <label htmlFor="email">
-              <i class="fa-regular fa-envelope"><hr /></i>
-            </label>
-          </div>
-
-          <div class="input-container">
+              Este campo es requerido.
+            </div>
             <input
               type="text"
               id="name"
@@ -102,61 +56,92 @@
             </label>
           </div>
 
+          <div class="input-container">
+            <div
+              class="error"
+              *ngIf="
+                !contactForm.get('email')?.errors?.required &&
+                contactForm.get('email')?.invalid &&
+                contactForm.get('email')?.touched
+              "
+            >
+              Correo electrónico inválido.
+            </div>
+
+            <div
+              class="error"
+              *ngIf="
+                contactForm.get('email')?.touched &&
+                contactForm.get('email')?.errors?.required
+              "
+            >
+              Este campo es requerido.
+            </div>
+
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Email"
+            />
+            <label htmlFor="email">
+              <i class="fa-regular fa-envelope"><hr /></i>
+            </label>
+          </div>
+
           <button (click)="nextStep()" class="full-center p-1 gap-1">
             Siguiente
             <i class="fa-solid fa-chevron-right"></i>
           </button>
         </div>
 
-        <div *ngIf="formStep === 1" class="column">
-          <!-- <mat-form-field>
-            <mat-label>Mensaje</mat-label>
-            <textarea
-              matInput
-              cdkTextareaAutosize
-              cdkAutosizeMinRows="4"
-              type="text"
-              formControlName="message"
-              (keyup)="handleTextAreaChange($event)"
-              maxlength="200"
-            ></textarea>
-
-            <mat-error
+        <div *ngIf="formStep === 1" class="column gap-2">
+          <div class="input-container">
+            <div
+              class="error"
               *ngIf="
-                contactForm.get('email')?.invalid &&
-                contactForm.get('email')?.touched
+                !contactForm.get('message')?.errors?.required &&
+                contactForm.get('message')?.touched &&
+                contactForm.get('message')?.errors?.minlength
               "
-              >Correo electrónico inválido.</mat-error
             >
-
-            <mat-error
+              Mínimo 10 carácteres ({{ textAreaCharacters }}/10)
+            </div>
+            <div
+              class="error"
+              *ngIf="
+                !contactForm.get('message')?.errors?.required &&
+                contactForm.get('message')?.errors?.maxlength
+              "
+            >
+              Máximo 150 carácteres ({{ textAreaCharacters }}/150)
+            </div>
+            <div
+              class="error"
               *ngIf="
                 contactForm.get('message')?.touched &&
                 contactForm.get('message')?.errors?.required
               "
             >
-              Campo obligatorio</mat-error
-            ><mat-error
-              *ngIf="
-                contactForm.get('message')?.touched &&
-                contactForm.get('message')?.errors?.minlength
-              "
-            >
-              Mínimo 10 carácteres ({{ textAreaCharacters }}/10)</mat-error
-            ><mat-error
-              *ngIf="
-                contactForm.get('message')?.touched &&
-                contactForm.get('message')?.errors?.maxlength
-              "
-            >
-              Máximo 150 carácteres ({{ textAreaCharacters }}/150)</mat-error
-            >
-          </mat-form-field> -->
-          <button type="submit" class="full-center">Enviar</button>
+              Este campo es requerido.
+            </div>
+            <textarea
+              class="full-center p-1"
+              type="text"
+              id="message"
+              formControlName="message"
+              placeholder="Hola! Necesito ayuda con la App..."
+              (keyup)="handleTextAreaChange($event)"
+              maxlength="200"
+            ></textarea>
+          </div>
+          <button type="submit" class="full-center p-1">Enviar</button>
         </div>
-
-        <div *ngIf="formStep === 2" class="column full-center gap-1">
-          <h3>Recibido! Nuestro equipo te responderá lo más pronto posible</h3>
+        <div
+          *ngIf="formStep === 2"
+          class="form_finished column full-center gap-1"
+        >
+          <h3>¡Recibido! Nuestro equipo te responderá lo más pronto posible</h3>
           <button class="full-center" (click)="resetForm()">
             Enviar otro mensaje
           </button>

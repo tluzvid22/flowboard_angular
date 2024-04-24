@@ -7,7 +7,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrl: './article5.component.scss',
 })
 export class Article5Component {
-  @ViewChild('myFormDirective') myFormDirective: any;
   public contactForm: FormGroup;
   public formStep: number = 0;
   public textAreaCharacters: number = 0;
@@ -62,7 +61,6 @@ export class Article5Component {
     this.contactForm.setErrors(null);
 
     this.contactForm.reset();
-    this.myFormDirective?.resetForm();
   }
 
   public handleTextAreaChange(event: any) {

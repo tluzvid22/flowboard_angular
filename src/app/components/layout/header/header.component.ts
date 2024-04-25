@@ -6,10 +6,4 @@ import { Router } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
-  private router: Router = new Router();
-
-  public navigateTo(page: string) {
-    this.router.navigate([page]);
-  }
-}
+export class HeaderComponent {}

@@ -29,11 +29,7 @@
           </div>
         </div>
       </div>
-      <form
-        [formGroup]="contactForm"
-        #myFormDirective="ngForm"
-        (ngSubmit)="handleSubmit()"
-      >
+      <form [formGroup]="contactForm" (ngSubmit)="handleSubmit()">
         <div *ngIf="formStep === 0" class="column gap-1">
           <div class="input-container">
             <div
@@ -51,7 +47,7 @@
               formControlName="username"
               placeholder="Nombre"
             />
-            <label htmlFor="name">
+            <label for="name">
               <i class="fa-regular fa-user"><hr /></i>
             </label>
           </div>
@@ -84,7 +80,7 @@
               formControlName="email"
               placeholder="Email"
             />
-            <label htmlFor="email">
+            <label for="email">
               <i class="fa-regular fa-envelope"><hr /></i>
             </label>
           </div>

@@ -1,7 +1,92 @@
-<p>login works!</p>
-<p>login works!</p>
-<p>login works!</p>
-<p>login works!</p>
-<p>login works!</p>
-<p>login works!</p>
-<p>login works!</p>
+<div class="wrapper column space-between align-center poppins">
+  <header class="row space-between align-center full-width">
+    <img
+      class="logo p-1"
+      src="assets/logos/flowboard.svg"
+      alt="Flowboard logo"
+      [routerLink]="['/home']"
+    />
+    <div [routerLink]="['/signup']" class="register row full-center p-1 gap-05">
+      <a>No tienes una cuenta?</a>
+      <button class="p-05">Regístrate</button>
+    </div>
+  </header>
+
+  <form
+    [formGroup]="contactForm"
+    (ngSubmit)="handleSubmit()"
+    class="column full-center gap-1"
+  >
+    <div class="headlines">
+      <h2>Inicia sesión</h2>
+      <p class="mulish">Por favor, acceda a su cuenta</p>
+    </div>
+
+    <div class="input-container">
+      <div
+        class="error"
+        *ngIf="
+          !contactForm.get('email')?.errors?.required &&
+          contactForm.get('email')?.invalid &&
+          contactForm.get('email')?.touched
+        "
+      >
+        Correo electrónico inválido.
+      </div>
+
+      <div
+        class="error"
+        *ngIf="
+          contactForm.get('email')?.touched &&
+          contactForm.get('email')?.errors?.required
+        "
+      >
+        Este campo es requerido.
+      </div>
+
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        placeholder="Correo electrónico"
+      />
+    </div>
+    <!-- Email input -->
+
+    <div class="input-container">
+      <div
+        class="error"
+        *ngIf="
+          contactForm.get('username')?.invalid &&
+          contactForm.get('username')?.touched
+        "
+      >
+        Este campo es requerido.
+      </div>
+      <input
+        type="{{ isPasswordVisible ? 'text' : 'password' }}"
+        id="password"
+        formControlName="password"
+        placeholder="Contraseña"
+      />
+      <label (click)="isPasswordVisible = !isPasswordVisible" for="password">
+        <i *ngIf="isPasswordVisible" class="fa-solid fa-eye-slash"></i>
+        <i *ngIf="!isPasswordVisible" class="fa-solid fa-eye"></i>
+      </label>
+    </div>
+    <!-- Password input -->
+
+    <div class="additional row space-between full-width">
+      <div class="checkbox row gap-05 full-center">
+        <input type="checkbox" id="rememberMe" />
+        <label for="rememberMe">Recuérdame</label>
+      </div>
+
+      <a href="#">Olvidó su contraseña?</a>
+    </div>
+
+    <button type="submit">INICIAR SESIÓN</button>
+  </form>
+
+  <footer>© 2024 Flowboard - Tobías Luzuriaga Vidal TFG</footer>
+</div>

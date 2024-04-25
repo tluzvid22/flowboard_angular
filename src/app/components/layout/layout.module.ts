@@ -9,7 +9,7 @@ import { Article4Component } from './article4/article4.component';
 import { Article5Component } from './article5/article5.component';
 import { FooterComponent } from './footer/footer.component';
 import { LayoutComponent } from './layout.component';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -22,7 +22,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     Article5Component,
     FooterComponent,
   ],
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   bootstrap: [LayoutComponent],
 })
 export class LayoutModule {}

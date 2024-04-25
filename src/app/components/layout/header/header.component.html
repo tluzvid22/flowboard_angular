@@ -14,11 +14,7 @@
     </div>
   </div>
   <div class="userBar">
-    <button (click)="navigateTo('login')" class="loginBtn">
-      Inicia sesión
-    </button>
-    <button (click)="navigateTo('signup')" class="registerBtn">
-      Regrístrate
-    </button>
+    <button [routerLink]="['/login']" class="loginBtn">Inicia sesión</button>
+    <button [routerLink]="['/signup']" class="registerBtn">Regrístrate</button>
   </div>
 </header>

@@ -1,0 +1,326 @@
+<div class="wrapper row poppins">
+  <div class="left column gap-5 align-center">
+    <header class="row space-between align-center full-width">
+      <img
+        class="logo p-1"
+        src="/assets/logos/flowboard.svg"
+        alt="Flowboard logo"
+        [routerLink]="['/home']"
+      />
+      <div [routerLink]="['/login']" class="login row full-center p-1 gap-05">
+        <a>Ya tienes una cuenta?</a>
+        <button class="p-05">Inicia sesión</button>
+      </div>
+    </header>
+
+    <form
+      [formGroup]="signUpForm"
+      (ngSubmit)="handleSubmit()"
+      class="column full-center"
+    >
+      <div
+        class="step1 column full-center full-width gap-05"
+        *ngIf="getFormStep() === 1"
+      >
+        <div class="headlines">
+          <h2>Regístrate</h2>
+          <p class="mulish">Es completamente gratuito!</p>
+        </div>
+
+        <div class="names row gap-05">
+          <div class="input-container">
+            <div
+              class="error"
+              *ngIf="
+                signUpForm.get('name')?.invalid &&
+                signUpForm.get('name')?.touched
+              "
+            >
+              Este campo es requerido.
+            </div>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              placeholder="Nombres"
+            />
+          </div>
+          <!-- Name input -->
+
+          <div class="input-container">
+            <div
+              class="error"
+              *ngIf="
+                signUpForm.get('lastname')?.invalid &&
+                signUpForm.get('lastname')?.touched
+              "
+            >
+              Este campo es requerido.
+            </div>
+            <input
+              type="text"
+              id="lastname"
+              formControlName="lastname"
+              placeholder="Apellidos"
+            />
+          </div>
+          <!-- Last Name input -->
+        </div>
+        <!-- Name input -->
+
+        <div class="passwords column gap-05 full-width">
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('password')?.touched &&
+              signUpForm.get('confirmPassword')?.touched &&
+              !signUpForm.get('password')?.errors?.passwordStrength &&
+              (signUpForm.get('password')?.errors?.required ||
+                signUpForm.get('confirmPassword')?.errors?.required)
+            "
+          >
+            Campos requeridos.
+          </div>
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('password')?.touched &&
+              !signUpForm.get('password')?.errors?.required &&
+              signUpForm.get('password')?.errors?.passwordStrength
+            "
+          >
+            {{ signUpForm.get("password")?.errors?.message }}
+          </div>
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('password')?.touched &&
+              signUpForm.get('confirmPassword')?.touched &&
+              !(
+                signUpForm.get('password')?.errors?.required ||
+                signUpForm.get('confirmPassword')?.errors?.required
+              ) &&
+              !signUpForm.get('password')?.errors?.passwordStrength &&
+              signUpForm.get('password')?.errors?.differentPasswords
+            "
+          >
+            Las contraseñas deben coincidir
+          </div>
+          <div class="input-container">
+            <input
+              type="{{ isPasswordVisible ? 'text' : 'password' }}"
+              id="password"
+              formControlName="password"
+              placeholder="Contraseña"
+              (keyup)="calcPasswordStrength()"
+            />
+          </div>
+          <div class="input-container">
+            <input
+              type="{{ isPasswordVisible ? 'text' : 'password' }}"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              placeholder=" Confirmar contraseña"
+              (keyup)="calcPasswordStrength()"
+            />
+            <label
+              (click)="isPasswordVisible = !isPasswordVisible"
+              for="password"
+            >
+              <i *ngIf="isPasswordVisible" class="fa-solid fa-eye-slash"></i>
+              <i *ngIf="!isPasswordVisible" class="fa-solid fa-eye"></i>
+            </label>
+          </div>
+          <div class="strength column">
+            <div class="lines row gap-05">
+              <hr class="low" />
+              <hr [ngClass]="passwordStrength >= 2 ? 'medium' : ''" />
+              <hr [ngClass]="passwordStrength >= 3 ? 'high' : ''" />
+            </div>
+            <p>Seguridad de la contraseña</p>
+          </div>
+        </div>
+        <!-- Password input -->
+
+        <button class="poppins full-width" (click)="nextStep()">
+          SIGUIENTE
+        </button>
+      </div>
+      <div
+        class="step2 column full-center full-width gap-05"
+        *ngIf="getFormStep() === 2"
+      >
+        <div class="headlines">
+          <h2>Paso 2</h2>
+          <p class="mulish">Solo te quedan dos pasos</p>
+        </div>
+
+        <div
+          class="error"
+          *ngIf="
+            signUpForm.get('email')?.touched &&
+            !signUpForm.get('email')?.errors?.required &&
+            signUpForm.get('email')?.errors?.email
+          "
+        >
+          El correo electrónico debe ser valido
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            signUpForm.get('email')?.touched &&
+            signUpForm.get('confirmEmail')?.touched &&
+            !signUpForm.get('email')?.errors?.email &&
+            (signUpForm.get('email')?.errors?.required ||
+              signUpForm.get('confirmEmail')?.errors?.required)
+          "
+        >
+          Campos requeridos
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            !(
+              signUpForm.get('email')?.errors?.required ||
+              signUpForm.get('confirmEmail')?.errors?.required
+            ) &&
+            !signUpForm.get('email')?.errors?.email &&
+            signUpForm.get('email')?.errors?.differentEmails
+          "
+        >
+          Los correos electrónicos deben coincidir
+        </div>
+
+        <div class="input-container">
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="Correo electrónico"
+            (keyup)="compareEmails()"
+          />
+          <!-- Email input -->
+        </div>
+        <div class="input-container">
+          <input
+            type="email"
+            id="confirmEmail"
+            formControlName="confirmEmail"
+            placeholder="Confirmar correo electrónico"
+            (keyup)="compareEmails()"
+          />
+          <!-- Confirm Email input -->
+        </div>
+
+        <div class="buttons row full-width full-center gap-1">
+          <button class="poppins full-width" (click)="lastStep()">
+            ANTERIOR
+          </button>
+          <button class="poppins full-width" (click)="nextStep()">
+            SIGUIENTE
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="step3 column full-center full-width gap-05"
+        *ngIf="getFormStep() === 3"
+      >
+        <div class="headlines row align-center space-between full-width">
+          <div class="text">
+            <h2>Paso 3</h2>
+            <p class="mulish">Completa tu perfil</p>
+          </div>
+          <div class="profile_img">
+            <img
+              src="/assets/img/defaultpicture.jpg"
+              alt="Default profile picture"
+            />
+            <i class="fa-solid fa-pen clickable"></i>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('username')?.invalid &&
+              signUpForm.get('username')?.touched
+            "
+          >
+            Este campo es requerido.
+          </div>
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            placeholder="Nombre de usuario"
+          />
+        </div>
+        <!-- Username input -->
+
+        <div class="input-container">
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('address')?.invalid &&
+              signUpForm.get('address')?.touched
+            "
+          >
+            Este campo es requerido.
+          </div>
+          <input
+            type="text"
+            id="address"
+            formControlName="address"
+            placeholder="Dirección"
+          />
+        </div>
+        <!-- Address input -->
+
+        <div class="input-container">
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('phone')?.errors?.required &&
+              signUpForm.get('phone')?.touched
+            "
+          >
+            Este campo es requerido.
+          </div>
+          <div
+            class="error"
+            *ngIf="
+              !signUpForm.get('phone')?.errors?.required &&
+              signUpForm.get('phone')?.touched &&
+              signUpForm.get('phone')?.errors?.pattern
+            "
+          >
+            El número de teléfono debe ser válido
+          </div>
+          <input
+            type="text"
+            id="phone"
+            formControlName="phone"
+            placeholder="Número de teléfono"
+          />
+        </div>
+        <!-- Telephone input -->
+
+        <div class="buttons row full-width full-center gap-1">
+          <button class="poppins full-width" (click)="lastStep()">
+            ANTERIOR
+          </button>
+          <button class="poppins full-width" (click)="nextStep()">
+            SIGUIENTE
+          </button>
+        </div>
+      </div>
+      <p class="terms_and_conditions">
+        Al Crear una Cuenta, aceptas nuestros <span>Términos</span> y
+        <span>Condiciones</span>
+      </p>
+    </form>
+  </div>
+  <div class="right"></div>
+</div>

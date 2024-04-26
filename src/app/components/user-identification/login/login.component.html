@@ -57,8 +57,8 @@
       <div
         class="error"
         *ngIf="
-          contactForm.get('username')?.invalid &&
-          contactForm.get('username')?.touched
+          contactForm.get('password')?.invalid &&
+          contactForm.get('password')?.touched
         "
       >
         Este campo es requerido.
@@ -85,7 +85,7 @@
       <a href="#">Olvidó su contraseña?</a>
     </div>
 
-    <button type="submit">INICIAR SESIÓN</button>
+    <button class="poppins" type="submit">INICIAR SESIÓN</button>
   </form>
 
   <footer>© 2024 Flowboard - Tobías Luzuriaga Vidal TFG</footer>

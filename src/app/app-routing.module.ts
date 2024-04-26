@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './user-identification/login/login.component';
-import { SignupComponent } from './user-identification/signup/signup.component';
 import { LayoutComponent } from './components/layout/layout.component';
+import { LoginComponent } from './components/user-identification/login/login.component';
+import { SignupComponent } from './components/user-identification/signup/signup.component';
+import { singUpAuthGuard } from './components/auth/sing-up-auth.guard';
 
 const routes: Routes = [
   {
@@ -14,7 +15,11 @@ const routes: Routes = [
   { path: 'home', component: LayoutComponent },
 
   { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
+  {
+    path: 'signup/step/:id',
+    canActivate: [singUpAuthGuard],
+    component: SignupComponent,
+  },
   {
     path: '**',
     redirectTo: 'home',

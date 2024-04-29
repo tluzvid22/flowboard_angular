@@ -113,6 +113,7 @@ $editpenbackground: #d6d6d6;
           color: $inputtextcolor;
           font-size: 15px;
           padding: 12px 10px;
+          font-weight: 500;
         }
 
         input::-ms-reveal,
@@ -190,21 +191,44 @@ $editpenbackground: #d6d6d6;
           .profile_img {
             width: 11.5rem;
             img {
-              width: 11rem;
+              width: 9rem;
               height: auto;
               border-radius: 100%;
             }
 
             i {
-              padding: 0.6rem;
+              padding: 0.4rem;
               background-color: $editpenbackground;
               color: $headertextcolor;
               border-radius: 100%;
               position: absolute;
               bottom: 0.8rem;
-              right: 1.5rem;
+              right: 3.2rem;
+            }
+
+            input[type="file"] {
+              display: none;
             }
           }
+        }
+
+        label {
+          font-weight: 600;
+          font-family: "Poppins", "Roboto", system-ui;
+          font-size: 15px;
+          letter-spacing: -0.5px;
+        }
+
+        select {
+          border-radius: 2px;
+          border: $inputbordercolor 1px solid;
+          width: 100%;
+          font-weight: 300;
+          font-family: "Mulish", "Roboto", system-ui;
+          color: $inputtextcolor;
+          font-size: 15px;
+          padding: 12px 10px;
+          font-weight: 500;
         }
       }
     }

@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { LoginComponent } from './components/user-identification/login/login.component';
 import { SignupComponent } from './components/user-identification/signup/signup.component';
-import { singUpAuthGuard } from './components/auth/sing-up-auth.guard';
+import { singUpAuthGuard } from './auth/sing-up-auth.guard';
 
 const routes: Routes = [
   {

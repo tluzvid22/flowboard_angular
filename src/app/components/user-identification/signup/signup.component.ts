@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,6 +13,9 @@ import {
   RouterLink,
   RouterLinkActive,
 } from '@angular/router';
+import { catchError, switchMap, throwError, timer } from 'rxjs';
+import { CountriesAPIService } from 'src/app/shared/services/countries/countries.service';
+import { City, Country, State } from 'src/app/shared/types/countries';
 import { PasswordValidator } from 'src/app/validators/passwordValidator';
 
 const passwordLength: number = 8;
@@ -26,6 +30,10 @@ const phoneValidPattern: string =
   styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
+  @ViewChild('countrySelect') countrySelect: any;
+  @ViewChild('stateSelect') stateSelect: any;
+  @ViewChild('imageInput') imageInput: any;
+
   public signUpForm: FormGroup;
   public isPasswordVisible: boolean = false;
   public static formStep: number = 3;
@@ -42,10 +50,14 @@ export class SignupComponent {
     address: '',
     phone: '',
   };
+  public location: { countries: Country[]; states: State[]; cities: City[] };
+  public countrySelected: string = 'AR';
+  public stateSelected: string = 'AR-B';
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private countriesService: CountriesAPIService
   ) {
     const savedData = localStorage.getItem('SignUpInfo');
     if (savedData !== null) {
@@ -76,6 +88,9 @@ export class SignupComponent {
       ],
     });
     SignupComponent.formStep = +this.activatedRoute.snapshot.params['id'];
+
+    this.location = { countries: [], states: [], cities: [] };
+    this.fetchLocationData();
   }
 
   public handleSubmit() {}
@@ -126,6 +141,7 @@ export class SignupComponent {
   public calcPasswordStrength() {
     let password1 = this.signUpForm.get('password');
     let password2 = this.signUpForm.get('confirmPassword');
+
     if (password1?.value !== password2?.value) {
       this.passwordStrength = 1;
       let errors = password1?.errors;
@@ -143,8 +159,7 @@ export class SignupComponent {
       //handle same passwords case (deleting different passwords attribute)
     }
     //different passwords (low security password)
-
-    if (password1?.errors?.passwordStrength === undefined) {
+    if (password2?.errors?.passwordStrength === undefined) {
       this.passwordStrength = 2;
       //no validation errors (medium security password)
     } else {
@@ -195,5 +210,155 @@ export class SignupComponent {
 
   public debugHTML(toDebug: any) {
     console.log(toDebug);
+  }
+
+  private fetchLocationData() {
+    this.countriesService
+      .getCountries()
+      .pipe(
+        switchMap((countries: Country[]) => {
+          this.location.countries = countries;
+          return timer(500).pipe(
+            switchMap(() =>
+              this.countriesService.getStates(this.countrySelected)
+            )
+          );
+        }),
+        switchMap((states: State[]) => {
+          this.location.states = states;
+          this.findInitCountry();
+          return timer(500).pipe(
+            switchMap(() =>
+              this.countriesService.getCities(
+                this.countrySelected,
+                this.stateSelected
+              )
+            )
+          );
+        }),
+        catchError((error) => {
+          console.error('Error fetching data:', error);
+          return throwError(error);
+        })
+      )
+      .subscribe((cities: City[]) => {
+        this.location.cities = cities;
+        this.findInitState();
+      });
+  }
+
+  updateCountry(event: any): string {
+    const selectElement = event.target as HTMLSelectElement;
+    this.countrySelected = selectElement.value;
+    return this.countrySelected;
+  }
+
+  updateStates() {
+    this.countriesService
+      .getStates(this.countrySelected)
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching states:', error);
+          if (error.status === 404) {
+            let nextCountry: number = this.location.countries.findIndex(
+              (obj) => obj.key === this.countrySelected
+            );
+            //search country giving issues
+
+            this.location.countries.splice(nextCountry, 1);
+            //delete country giving issues
+
+            nextCountry++;
+            if (nextCountry >= this.location.countries.length) nextCountry = 0;
+            this.countrySelected = this.location.countries[nextCountry].key;
+            this.countrySelect.nativeElement.selectedIndex = nextCountry;
+
+            const source = timer(500);
+            source.subscribe(() => {
+              this.updateStates();
+            });
+            //select next country and update states
+          }
+          // pick next country if it's API giving errors
+          return throwError(error);
+        })
+      )
+      .subscribe((states: State[]) => {
+        this.location.states = states;
+        const source = timer(500);
+        source.subscribe(() => {
+          this.updateCities(null);
+        });
+      });
+  }
+
+  updateCities(event: any) {
+    if (!event) {
+      this.stateSelected = this.location.states[1].key;
+    } else {
+      const selectElement = event.target as HTMLSelectElement;
+      this.stateSelected = selectElement.value;
+    }
+
+    this.countriesService
+      .getCities(this.countrySelected, this.stateSelected)
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching cities:', error);
+          if (error.status === 404) {
+            let nextState: number = this.location.states.findIndex(
+              (obj) => obj.key === this.stateSelected
+            );
+            //search state giving issues
+
+            this.location.states.splice(nextState, 1);
+            //delete state giving issues
+
+            nextState++;
+            if (nextState >= this.location.states.length) nextState = 0;
+            this.stateSelected = this.location.states[nextState].key;
+            this.stateSelect.nativeElement.selectedIndex = nextState;
+
+            const source = timer(500);
+            source.subscribe(() => {
+              this.updateCities(null);
+            });
+            //select next country and update states
+          }
+          // pick next state if it's API giving errors
+          return throwError(error);
+        })
+      )
+      .subscribe((cities: City[]) => {
+        this.location.cities = cities;
+      });
+  }
+
+  findInitCountry(): number {
+    let index = this.location.countries.findIndex(
+      (obj) => obj.key === this.countrySelected
+    );
+    this.countrySelect.nativeElement.selectedIndex = index;
+    return index;
+  }
+
+  findInitState(): number {
+    let index = this.location.states.findIndex(
+      (obj) => obj.key === this.stateSelected
+    );
+    this.stateSelect.nativeElement.selectedIndex = index;
+    return index;
+  }
+
+  handleImageSubmit() {
+    this.imageInput.nativeElement.click();
+
+    //ToDo: Handle Image submit
+
+    //ToDo: Handle Extracting and binary parsing image upload
+
+    //ToDo: Handle uploading data to database
+
+    //ToDo: (optional) Handle input cleaning
   }
 }

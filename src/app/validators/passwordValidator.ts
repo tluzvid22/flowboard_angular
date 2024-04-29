@@ -11,7 +11,9 @@ export function PasswordValidator(minLength: number): ValidatorFn {
     const password: string = control.value;
 
     if (!password) {
-      return null;
+      return {
+        passwordStrength: true,
+      };
     }
 
     const passwordLength = password.length > minLength;

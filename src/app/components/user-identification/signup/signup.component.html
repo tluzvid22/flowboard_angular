@@ -222,100 +222,138 @@
         </div>
       </div>
 
-      <div
-        class="step3 column full-center full-width gap-05"
-        *ngIf="getFormStep() === 3"
-      >
-        <div class="headlines row align-center space-between full-width">
-          <div class="text">
-            <h2>Paso 3</h2>
-            <p class="mulish">Completa tu perfil</p>
-          </div>
-          <div class="profile_img">
-            <img
-              src="/assets/img/defaultpicture.jpg"
-              alt="Default profile picture"
-            />
-            <i class="fa-solid fa-pen clickable"></i>
-          </div>
+      < class="step3 column full-center full-width gap-05" *ngIf="getFormStep()
+      === 3" >
+      <div class="headlines row align-center space-between full-width">
+        <div class="text">
+          <h2>Paso 3</h2>
+          <p class="mulish">Completa tu perfil</p>
         </div>
-
-        <div class="input-container">
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('username')?.invalid &&
-              signUpForm.get('username')?.touched
-            "
-          >
-            Este campo es requerido.
-          </div>
-          <input
-            type="text"
-            id="username"
-            formControlName="username"
-            placeholder="Nombre de usuario"
+        <div class="profile_img">
+          <img
+            src="/assets/img/defaultpicture.jpg"
+            alt="Default profile picture"
           />
-        </div>
-        <!-- Username input -->
-
-        <div class="input-container">
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('address')?.invalid &&
-              signUpForm.get('address')?.touched
-            "
-          >
-            Este campo es requerido.
-          </div>
-          <input
-            type="text"
-            id="address"
-            formControlName="address"
-            placeholder="Dirección"
-          />
-        </div>
-        <!-- Address input -->
-
-        <div class="input-container">
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('phone')?.errors?.required &&
-              signUpForm.get('phone')?.touched
-            "
-          >
-            Este campo es requerido.
-          </div>
-          <div
-            class="error"
-            *ngIf="
-              !signUpForm.get('phone')?.errors?.required &&
-              signUpForm.get('phone')?.touched &&
-              signUpForm.get('phone')?.errors?.pattern
-            "
-          >
-            El número de teléfono debe ser válido
-          </div>
-          <input
-            type="text"
-            id="phone"
-            formControlName="phone"
-            placeholder="Número de teléfono"
-          />
-        </div>
-        <!-- Telephone input -->
-
-        <div class="buttons row full-width full-center gap-1">
-          <button class="poppins full-width" (click)="lastStep()">
-            ANTERIOR
-          </button>
-          <button class="poppins full-width" (click)="nextStep()">
-            SIGUIENTE
-          </button>
+          <i (click)="handleImageSubmit()" class="fa-solid fa-pen clickable"
+            ><input #imageInput type="file"
+          /></i>
         </div>
       </div>
+
+      <div class="input-container">
+        <div
+          class="error"
+          *ngIf="
+            signUpForm.get('username')?.invalid &&
+            signUpForm.get('username')?.touched
+          "
+        >
+          Este campo es requerido.
+        </div>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          placeholder="Nombre de usuario"
+        />
+      </div>
+      <!-- Username input -->
+
+      <div class="input-container">
+        <div
+          class="error"
+          *ngIf="
+            signUpForm.get('address')?.invalid &&
+            signUpForm.get('address')?.touched
+          "
+        >
+          Este campo es requerido.
+        </div>
+        <input
+          type="text"
+          id="address"
+          formControlName="address"
+          placeholder="Dirección"
+        />
+      </div>
+      <!-- Address input -->
+
+      <div class="input-container">
+        <div
+          class="error"
+          *ngIf="
+            signUpForm.get('phone')?.errors?.required &&
+            signUpForm.get('phone')?.touched
+          "
+        >
+          Este campo es requerido.
+        </div>
+        <div
+          class="error"
+          *ngIf="
+            !signUpForm.get('phone')?.errors?.required &&
+            signUpForm.get('phone')?.touched &&
+            signUpForm.get('phone')?.errors?.pattern
+          "
+        >
+          El número de teléfono debe ser válido
+        </div>
+        <input
+          type="text"
+          id="phone"
+          formControlName="phone"
+          placeholder="Número de teléfono"
+        />
+      </div>
+      <!-- Telephone input -->
+
+      <div class="country column gap-05 full-width">
+        <label for="country">País</label>
+        <select
+          #countrySelect
+          id="country"
+          (change)="updateCountry($event); updateStates()"
+        >
+          <option
+            *ngFor="let country of this.location.countries"
+            [value]="country.key"
+          >
+            {{ country.value }}
+          </option>
+        </select>
+      </div>
+      <!-- Country input -->
+
+      <div class="closer_location row gap-05 full-width">
+        <div class="state column gap-05 full-width">
+          <label for="state">Estado</label>
+          <select #stateSelect id="state" (change)="updateCities($event)">
+            <option
+              *ngFor="let state of this.location.states"
+              [value]="state.key"
+            >
+              {{ state.value }}
+            </option>
+          </select>
+        </div>
+        <!-- State input -->
+        <div class="city column gap-05 full-width">
+          <label for="city">Ciudad</label>
+          <select id="city">
+            <option
+              *ngFor="let city of this.location.cities"
+              [value]="city.key"
+            >
+              {{ city.value }}
+            </option>
+          </select>
+        </div>
+        <!-- City input -->
+      </div>
+
+      <button class="poppins full-width" (click)="handleSubmit()">
+        CREAR CUENTA
+      </button>
       <p class="terms_and_conditions">
         Al Crear una Cuenta, aceptas nuestros <span>Términos</span> y
         <span>Condiciones</span>

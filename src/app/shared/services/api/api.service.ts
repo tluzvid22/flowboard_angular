@@ -1,30 +1,26 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  constructor(private http: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
-  get(url: string): Observable<any> {
-    return this.http.get(url);
+  get<T>(url: string, options: any): Observable<T> {
+    return this.httpClient.get<T>(url, options) as Observable<T>;
   }
 
-  post(url: string, data: any): Observable<any> {
-    return this.http.post(url, data);
+  post<T>(url: string, body: any, options: any): Observable<T> {
+    return this.httpClient.post<T>(url, body, options) as Observable<T>;
   }
 
-  put(url: string, data: any): Observable<any> {
-    return this.http.put(url, data);
+  put<T>(url: string, body: any, options: any): Observable<T> {
+    return this.httpClient.put<T>(url, body, options) as Observable<T>;
   }
 
-  patch(url: string, data: any): Observable<any> {
-    return this.http.patch(url, data);
-  }
-
-  delete(url: string): Observable<any> {
-    return this.http.delete(url);
+  delete<T>(url: string, options: any): Observable<T> {
+    return this.httpClient.delete<T>(url, options) as Observable<T>;
   }
 }

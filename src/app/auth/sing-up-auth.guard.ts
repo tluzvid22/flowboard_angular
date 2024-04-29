@@ -1,5 +1,5 @@
 import { CanActivateFn, Router } from '@angular/router';
-import { SignupComponent } from '../user-identification/signup/signup.component';
+import { SignupComponent } from '../components/user-identification/signup/signup.component';
 import { inject } from '@angular/core';
 
 export const singUpAuthGuard: CanActivateFn = (route, state) => {

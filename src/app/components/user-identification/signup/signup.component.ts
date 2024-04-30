@@ -14,6 +14,7 @@ import {
 } from '@angular/router';
 import { catchError, switchMap, throwError, timer } from 'rxjs';
 import { CountriesAPIService } from 'src/app/shared/services/countries/countries.service';
+import Security from 'src/app/shared/services/security/security.service';
 import { City, Country, State } from 'src/app/shared/types/countries';
 import { PasswordValidator } from 'src/app/validators/passwordValidator';
 
@@ -59,7 +60,8 @@ export class SignupComponent {
   constructor(
     private activatedRoute: ActivatedRoute,
     private formBuilder: FormBuilder,
-    private countriesService: CountriesAPIService
+    private countriesService: CountriesAPIService,
+    private security: Security
   ) {
     const savedData = localStorage.getItem('SignUpInfo');
     if (savedData !== null) {
@@ -211,6 +213,12 @@ export class SignupComponent {
   private updateData() {
     this.data.name = this.signUpForm.get('name')?.value;
     this.data.lastname = this.signUpForm.get('lastname')?.value;
+    this.data.password = this.security.encrypt(
+      this.signUpForm.get('password')?.value()
+    );
+    console.log(this.data.password);
+    console.log(this.security.decrypt(this.data.password));
+
     //step1
 
     this.data.email = this.signUpForm.get('email')?.value;
@@ -218,6 +226,7 @@ export class SignupComponent {
     //step2
 
     //ToDO: Update both image and encrypt password
+
     this.data.address = this.signUpForm.get('address')?.value;
     this.data.username = this.signUpForm.get('username')?.value;
     this.data.phone = this.signUpForm.get('phone')?.value;

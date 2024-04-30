@@ -1,20 +1,24 @@
 // Country Interface
 export interface Country {
-  key: string;
-  value: string;
+  name: string;
+  iso2: string;
+  iso3: string;
+  phonecode: string;
+  capital: string;
+  currency: string;
+  native: string;
+  emoji: string;
 }
 
 // State Interface
 export interface State {
-  key: string;
-  value: string;
-  iso_a2: string;
+  name: string;
+  iso2: string;
 }
 
 // City Interface
 export interface City {
-  key: string;
-  value: string;
-  iso_a2: string;
-  state_code: string;
+  name: string;
+  latitude: string;
+  longitude: string;
 }

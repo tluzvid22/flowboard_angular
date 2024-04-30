@@ -113,7 +113,6 @@ $editpenbackground: #d6d6d6;
           color: $inputtextcolor;
           font-size: 15px;
           padding: 12px 10px;
-          font-weight: 500;
         }
 
         input::-ms-reveal,
@@ -228,8 +227,11 @@ $editpenbackground: #d6d6d6;
           color: $inputtextcolor;
           font-size: 15px;
           padding: 12px 10px;
-          font-weight: 500;
         }
+      }
+
+      ::placeholder {
+        opacity: 0.6;
       }
     }
   }

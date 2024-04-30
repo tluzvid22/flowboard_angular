@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -49,10 +48,13 @@ export class SignupComponent {
     username: '',
     address: '',
     phone: '',
+    country: '',
+    state: '',
+    city: '',
   };
   public location: { countries: Country[]; states: State[]; cities: City[] };
-  public countrySelected: string = 'AR';
-  public stateSelected: string = 'AR-B';
+  public countrySelected: string = 'AF';
+  public stateSelected: string = 'GHA';
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -86,6 +88,9 @@ export class SignupComponent {
         this.data.phone,
         [Validators.required, Validators.pattern(phoneValidPattern)], //returns 'pattern' property validation error
       ],
+      country: [this.data.country, Validators.required],
+      state: [this.data.state, Validators.required],
+      city: [this.data.city, Validators.required],
     });
     SignupComponent.formStep = +this.activatedRoute.snapshot.params['id'];
 
@@ -95,6 +100,7 @@ export class SignupComponent {
 
   public handleSubmit() {}
 
+  //goes to the next step
   public nextStep() {
     if (this.checkErrors()) {
       this.signUpForm.markAllAsTouched();
@@ -108,6 +114,7 @@ export class SignupComponent {
     this.isPasswordVisible = false;
   }
 
+  //goes to the step before the actual one
   public lastStep() {
     this.updateData();
     localStorage.setItem('SignUpInfo', JSON.stringify(this.data));
@@ -204,8 +211,20 @@ export class SignupComponent {
   private updateData() {
     this.data.name = this.signUpForm.get('name')?.value;
     this.data.lastname = this.signUpForm.get('lastname')?.value;
+    //step1
+
     this.data.email = this.signUpForm.get('email')?.value;
     this.data.confirmEmail = this.signUpForm.get('confirmEmail')?.value;
+    //step2
+
+    //ToDO: Update both image and encrypt password
+    this.data.address = this.signUpForm.get('address')?.value;
+    this.data.username = this.signUpForm.get('username')?.value;
+    this.data.phone = this.signUpForm.get('phone')?.value;
+    this.data.country = this.signUpForm.get('country')?.value;
+    this.data.state = this.signUpForm.get('state')?.value;
+    this.data.city = this.signUpForm.get('city')?.value;
+    //step3
   }
 
   public debugHTML(toDebug: any) {
@@ -217,17 +236,20 @@ export class SignupComponent {
       .getCountries()
       .pipe(
         switchMap((countries: Country[]) => {
-          this.location.countries = countries;
-          return timer(500).pipe(
+          this.location.countries = countries.sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          return timer(250).pipe(
             switchMap(() =>
               this.countriesService.getStates(this.countrySelected)
             )
           );
         }),
         switchMap((states: State[]) => {
-          this.location.states = states;
-          this.findInitCountry();
-          return timer(500).pipe(
+          this.location.states = states.sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          return timer(250).pipe(
             switchMap(() =>
               this.countriesService.getCities(
                 this.countrySelected,
@@ -242,8 +264,9 @@ export class SignupComponent {
         })
       )
       .subscribe((cities: City[]) => {
-        this.location.cities = cities;
-        this.findInitState();
+        this.location.cities = cities.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
       });
   }
 
@@ -258,96 +281,41 @@ export class SignupComponent {
       .getStates(this.countrySelected)
       .pipe(
         catchError((error) => {
-          console.error('Error fetching states:', error);
-          if (error.status === 404) {
-            let nextCountry: number = this.location.countries.findIndex(
-              (obj) => obj.key === this.countrySelected
-            );
-            //search country giving issues
-
-            this.location.countries.splice(nextCountry, 1);
-            //delete country giving issues
-
-            nextCountry++;
-            if (nextCountry >= this.location.countries.length) nextCountry = 0;
-            this.countrySelected = this.location.countries[nextCountry].key;
-            this.countrySelect.nativeElement.selectedIndex = nextCountry;
-
-            const source = timer(500);
-            source.subscribe(() => {
-              this.updateStates();
-            });
-            //select next country and update states
-          }
-          // pick next country if it's API giving errors
+          console.error('Error fetching states: ', error);
           return throwError(error);
         })
       )
       .subscribe((states: State[]) => {
-        this.location.states = states;
-        const source = timer(500);
-        source.subscribe(() => {
-          this.updateCities(null);
-        });
+        this.location.states = states.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+
+        this.updateCities(null);
       });
   }
 
   updateCities(event: any) {
     if (!event) {
-      this.stateSelected = this.location.states[1].key;
+      this.stateSelected = this.location.states[1].iso2;
     } else {
       const selectElement = event.target as HTMLSelectElement;
       this.stateSelected = selectElement.value;
     }
+    //handle cases when cities are updated from a change on city select / state select
 
     this.countriesService
       .getCities(this.countrySelected, this.stateSelected)
       .pipe(
         catchError((error) => {
           console.error('Error fetching cities:', error);
-          if (error.status === 404) {
-            let nextState: number = this.location.states.findIndex(
-              (obj) => obj.key === this.stateSelected
-            );
-            //search state giving issues
-
-            this.location.states.splice(nextState, 1);
-            //delete state giving issues
-
-            nextState++;
-            if (nextState >= this.location.states.length) nextState = 0;
-            this.stateSelected = this.location.states[nextState].key;
-            this.stateSelect.nativeElement.selectedIndex = nextState;
-
-            const source = timer(500);
-            source.subscribe(() => {
-              this.updateCities(null);
-            });
-            //select next country and update states
-          }
-          // pick next state if it's API giving errors
           return throwError(error);
         })
       )
       .subscribe((cities: City[]) => {
-        this.location.cities = cities;
+        this.location.cities = cities.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
       });
-  }
-
-  findInitCountry(): number {
-    let index = this.location.countries.findIndex(
-      (obj) => obj.key === this.countrySelected
-    );
-    this.countrySelect.nativeElement.selectedIndex = index;
-    return index;
-  }
-
-  findInitState(): number {
-    let index = this.location.states.findIndex(
-      (obj) => obj.key === this.stateSelected
-    );
-    this.stateSelect.nativeElement.selectedIndex = index;
-    return index;
   }
 
   handleImageSubmit() {

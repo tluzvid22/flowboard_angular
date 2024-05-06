@@ -3,8 +3,10 @@ export interface User {
   lastName: string;
   password: string;
   email: string;
+  confirmEmail?: string;
   username: string;
-  adress: string;
+  imageid: string | File | number;
+  address: string;
   phone: string;
   country: string;
   state: string;

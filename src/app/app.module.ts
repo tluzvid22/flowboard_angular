@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { LoginComponent } from './components/user-identification/login/login.component';
 import { SignupComponent } from './components/user-identification/signup/signup.component';
 import { HttpClientModule } from '@angular/common/http';
+import { DashboardModule } from './components/dashboard/dashboard.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -15,6 +16,7 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     AppRoutingModule,
     LayoutModule,
+    DashboardModule,
     RouterModule,
     LoginComponent,
     SignupComponent,

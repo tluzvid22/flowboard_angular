@@ -1,0 +1,27 @@
+<div class="wrapper full-center">
+  <ul class="content row">
+    <li class="list" *ngFor="let list of this.lists">
+      <app-list [list]="list"></app-list>
+    </li>
+    <li class="add_list">
+      <div *ngIf="this.isAddListClicked" class="clicked column gap-05">
+        <input type="text" />
+        <div class="buttons row gap-05 align-center">
+          <button (click)="addList()">Añadir lista</button>
+          <i
+            (click)="this.isAddListClicked = !this.isAddListClicked"
+            class="fa-solid fa-xmark clickable"
+          ></i>
+        </div>
+      </div>
+      <div
+        *ngIf="!this.isAddListClicked"
+        (click)="this.isAddListClicked = !this.isAddListClicked"
+        class="not_clicked row gap-05 full-center p-1 clickable"
+      >
+        <i class="fa-solid fa-plus clickable"></i>
+        <p>Añade una lista</p>
+      </div>
+    </li>
+  </ul>
+</div>

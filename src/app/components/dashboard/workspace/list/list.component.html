@@ -1,0 +1,12 @@
+<div class="wrapper column">
+  <h3 class="title">{{ this.list.name }}</h3>
+  <ul class="justify-center gap-05 column">
+    <li *ngFor="let task of this.list.tasks">
+      <app-task class="task" [task]="task"></app-task>
+    </li>
+    <li class="add_task row gap-05 full-center p-1 clickable">
+      <i class="fa-solid fa-plus"></i>
+      <p>Añade una tarea</p>
+    </li>
+  </ul>
+</div>

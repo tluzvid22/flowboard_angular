@@ -5,6 +5,7 @@ import { LayoutComponent } from './components/layout/layout.component';
 import { LoginComponent } from './components/user-identification/login/login.component';
 import { SignupComponent } from './components/user-identification/signup/signup.component';
 import { singUpAuthGuard } from './auth/sing-up-auth.guard';
+import { DashboardComponent } from './components/dashboard/dashboard/dashboard.component';
 
 const routes: Routes = [
   {
@@ -13,12 +14,18 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   { path: 'home', component: LayoutComponent },
-
   { path: 'login', component: LoginComponent },
   {
     path: 'signup/step/:id',
     canActivate: [singUpAuthGuard],
     component: SignupComponent,
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () =>
+      import('./components/dashboard/dashboard.module').then(
+        (m) => m.DashboardModule
+      ),
   },
   {
     path: '**',

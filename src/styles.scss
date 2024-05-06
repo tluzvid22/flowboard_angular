@@ -178,6 +178,12 @@ body {
 .align-center {
   align-items: center;
 }
+.align-start {
+  align-items: flex-start;
+}
+.align-end {
+  align-items: flex-end;
+}
 
 .justify-center {
   justify-content: center;
@@ -185,6 +191,10 @@ body {
 
 .justify-left {
   justify-content: flex-start;
+}
+
+.justify-right {
+  justify-content: flex-end;
 }
 
 .full-center {
@@ -195,6 +205,10 @@ body {
 
 .hidden {
   display: none;
+}
+
+.inverted {
+  transform: scaleX(-1);
 }
 
 .full-width {
@@ -216,3 +230,12 @@ body {
 .mulish {
   font-family: "Mulish", "Roboto", system-ui;
 }
+
+.red {
+  background-color: red;
+}
+
+.green {
+  background-color: green;
+}
+//debug layouts

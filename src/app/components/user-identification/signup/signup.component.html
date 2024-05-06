@@ -1,5 +1,5 @@
 <div class="wrapper row poppins">
-  <div class="left column gap-5 align-center">
+  <div class="left column align-center">
     <header class="row space-between align-center full-width">
       <img
         class="logo p-1"
@@ -13,357 +13,378 @@
       </div>
     </header>
 
-    <form
-      [formGroup]="signUpForm"
-      (ngSubmit)="handleSubmit()"
-      class="column full-center"
-    >
-      <div
-        class="step1 column full-center full-width gap-05"
-        *ngIf="getFormStep() === 1"
-      >
-        <div class="headlines">
-          <h2>Regístrate</h2>
-          <p class="mulish">Es completamente gratuito!</p>
-        </div>
+    <div class="form_container full-center">
+      <form [formGroup]="signUpForm" class="column full-center">
+        <div
+          class="step1 column full-center full-width gap-05"
+          *ngIf="getFormStep() === 1"
+        >
+          <div class="headlines">
+            <h2>Regístrate</h2>
+            <p class="mulish">Es completamente gratuito!</p>
+          </div>
 
-        <div class="names row gap-05">
-          <div class="input-container">
-            <div
-              class="error"
-              *ngIf="
-                signUpForm.get('name')?.invalid &&
-                signUpForm.get('name')?.touched
-              "
-            >
-              Este campo es requerido.
+          <div class="names row gap-05">
+            <div class="input-container">
+              <div
+                class="error"
+                *ngIf="
+                  signUpForm.get('name')?.invalid &&
+                  signUpForm.get('name')?.touched
+                "
+              >
+                Este campo es requerido.
+              </div>
+              <input
+                type="text"
+                id="name"
+                formControlName="name"
+                placeholder="Nombres"
+              />
             </div>
-            <input
-              type="text"
-              id="name"
-              formControlName="name"
-              placeholder="Nombres"
-            />
+            <!-- Name input -->
+
+            <div class="input-container">
+              <div
+                class="error"
+                *ngIf="
+                  signUpForm.get('lastname')?.invalid &&
+                  signUpForm.get('lastname')?.touched
+                "
+              >
+                Este campo es requerido.
+              </div>
+              <input
+                type="text"
+                id="lastname"
+                formControlName="lastname"
+                placeholder="Apellidos"
+              />
+            </div>
+            <!-- Last Name input -->
           </div>
           <!-- Name input -->
 
-          <div class="input-container">
+          <div class="passwords column gap-05 full-width">
             <div
               class="error"
               *ngIf="
-                signUpForm.get('lastname')?.invalid &&
-                signUpForm.get('lastname')?.touched
+                signUpForm.get('password')?.touched &&
+                signUpForm.get('confirmPassword')?.touched &&
+                !signUpForm.get('password')?.errors?.passwordStrength &&
+                (signUpForm.get('password')?.errors?.required ||
+                  signUpForm.get('confirmPassword')?.errors?.required)
               "
             >
-              Este campo es requerido.
+              Campos requeridos.
             </div>
-            <input
-              type="text"
-              id="lastname"
-              formControlName="lastname"
-              placeholder="Apellidos"
-            />
-          </div>
-          <!-- Last Name input -->
-        </div>
-        <!-- Name input -->
-
-        <div class="passwords column gap-05 full-width">
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('password')?.touched &&
-              signUpForm.get('confirmPassword')?.touched &&
-              !signUpForm.get('password')?.errors?.passwordStrength &&
-              (signUpForm.get('password')?.errors?.required ||
-                signUpForm.get('confirmPassword')?.errors?.required)
-            "
-          >
-            Campos requeridos.
-          </div>
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('password')?.touched &&
-              !signUpForm.get('password')?.errors?.required &&
-              signUpForm.get('password')?.errors?.passwordStrength
-            "
-          >
-            {{ signUpForm.get("password")?.errors?.message }}
-          </div>
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('password')?.touched &&
-              signUpForm.get('confirmPassword')?.touched &&
-              !(
-                signUpForm.get('password')?.errors?.required ||
-                signUpForm.get('confirmPassword')?.errors?.required
-              ) &&
-              !signUpForm.get('password')?.errors?.passwordStrength &&
-              signUpForm.get('password')?.errors?.differentPasswords
-            "
-          >
-            Las contraseñas deben coincidir
-          </div>
-          <div class="input-container">
-            <input
-              type="{{ isPasswordVisible ? 'text' : 'password' }}"
-              id="password"
-              formControlName="password"
-              placeholder="Contraseña"
-              (keyup)="calcPasswordStrength()"
-            />
-          </div>
-          <div class="input-container">
-            <input
-              type="{{ isPasswordVisible ? 'text' : 'password' }}"
-              id="confirmPassword"
-              formControlName="confirmPassword"
-              placeholder=" Confirmar contraseña"
-              (keyup)="calcPasswordStrength()"
-            />
-            <label
-              (click)="isPasswordVisible = !isPasswordVisible"
-              for="password"
+            <div
+              class="error"
+              *ngIf="
+                signUpForm.get('password')?.touched &&
+                !signUpForm.get('password')?.errors?.required &&
+                signUpForm.get('password')?.errors?.passwordStrength
+              "
             >
-              <i *ngIf="isPasswordVisible" class="fa-solid fa-eye-slash"></i>
-              <i *ngIf="!isPasswordVisible" class="fa-solid fa-eye"></i>
-            </label>
-          </div>
-          <div class="strength column">
-            <div class="lines row gap-05">
-              <hr class="low" />
-              <hr [ngClass]="passwordStrength >= 2 ? 'medium' : ''" />
-              <hr [ngClass]="passwordStrength >= 3 ? 'high' : ''" />
+              {{ signUpForm.get("password")?.errors?.message }}
             </div>
-            <p>Seguridad de la contraseña</p>
+            <div
+              class="error"
+              *ngIf="
+                signUpForm.get('password')?.touched &&
+                signUpForm.get('confirmPassword')?.touched &&
+                !(
+                  signUpForm.get('password')?.errors?.required ||
+                  signUpForm.get('confirmPassword')?.errors?.required
+                ) &&
+                !signUpForm.get('password')?.errors?.passwordStrength &&
+                signUpForm.get('password')?.errors?.differentPasswords
+              "
+            >
+              Las contraseñas deben coincidir
+            </div>
+            <div class="input-container">
+              <input
+                type="{{ isPasswordVisible ? 'text' : 'password' }}"
+                id="password"
+                formControlName="password"
+                placeholder="Contraseña"
+                (keyup)="calcPasswordStrength()"
+              />
+            </div>
+            <div class="input-container">
+              <input
+                type="{{ isPasswordVisible ? 'text' : 'password' }}"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                placeholder=" Confirmar contraseña"
+                (keyup)="calcPasswordStrength()"
+              />
+              <label
+                (click)="isPasswordVisible = !isPasswordVisible"
+                for="password"
+              >
+                <i *ngIf="isPasswordVisible" class="fa-solid fa-eye-slash"></i>
+                <i *ngIf="!isPasswordVisible" class="fa-solid fa-eye"></i>
+              </label>
+            </div>
+            <div class="strength column">
+              <div class="lines row gap-05">
+                <hr class="low" />
+                <hr [ngClass]="passwordStrength >= 2 ? 'medium' : ''" />
+                <hr [ngClass]="passwordStrength >= 3 ? 'high' : ''" />
+              </div>
+              <p>Seguridad de la contraseña</p>
+            </div>
           </div>
-        </div>
-        <!-- Password input -->
+          <!-- Password input -->
 
-        <button class="poppins full-width" (click)="nextStep()">
-          SIGUIENTE
-        </button>
-      </div>
-      <div
-        class="step2 column full-center full-width gap-05"
-        *ngIf="getFormStep() === 2"
-      >
-        <div class="headlines">
-          <h2>Paso 2</h2>
-          <p class="mulish">Solo te quedan dos pasos</p>
-        </div>
-
-        <div
-          class="error"
-          *ngIf="
-            signUpForm.get('email')?.touched &&
-            !signUpForm.get('email')?.errors?.required &&
-            signUpForm.get('email')?.errors?.email
-          "
-        >
-          El correo electrónico debe ser valido
-        </div>
-        <div
-          class="error"
-          *ngIf="
-            signUpForm.get('email')?.touched &&
-            signUpForm.get('confirmEmail')?.touched &&
-            !signUpForm.get('email')?.errors?.email &&
-            (signUpForm.get('email')?.errors?.required ||
-              signUpForm.get('confirmEmail')?.errors?.required)
-          "
-        >
-          Campos requeridos
-        </div>
-        <div
-          class="error"
-          *ngIf="
-            !(
-              signUpForm.get('email')?.errors?.required ||
-              signUpForm.get('confirmEmail')?.errors?.required
-            ) &&
-            !signUpForm.get('email')?.errors?.email &&
-            signUpForm.get('email')?.errors?.differentEmails
-          "
-        >
-          Los correos electrónicos deben coincidir
-        </div>
-
-        <div class="input-container">
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="Correo electrónico"
-            (keyup)="compareEmails()"
-          />
-          <!-- Email input -->
-        </div>
-        <div class="input-container">
-          <input
-            type="email"
-            id="confirmEmail"
-            formControlName="confirmEmail"
-            placeholder="Confirmar correo electrónico"
-            (keyup)="compareEmails()"
-          />
-          <!-- Confirm Email input -->
-        </div>
-
-        <div class="buttons row full-width full-center gap-1">
-          <button class="poppins full-width" (click)="lastStep()">
-            ANTERIOR
-          </button>
           <button class="poppins full-width" (click)="nextStep()">
             SIGUIENTE
           </button>
         </div>
-      </div>
-
-      <div
-        class="step3 column full-center full-width gap-05"
-        *ngIf="getFormStep() === 3"
-      >
-        <div class="headlines row align-center space-between full-width">
-          <div class="text">
-            <h2>Paso 3</h2>
-            <p class="mulish">Completa tu perfil</p>
+        <div
+          class="step2 column full-center full-width gap-05"
+          *ngIf="getFormStep() === 2"
+        >
+          <div class="headlines">
+            <h2>Paso 2</h2>
+            <p class="mulish">Solo te quedan dos pasos</p>
           </div>
-          <div class="profile_img">
-            <img
-              src="/assets/img/defaultpicture.jpg"
-              alt="Default profile picture"
+
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('email')?.touched &&
+              !signUpForm.get('email')?.errors?.required &&
+              signUpForm.get('email')?.errors?.email
+            "
+          >
+            El correo electrónico debe ser valido
+          </div>
+          <div
+            class="error"
+            *ngIf="
+              signUpForm.get('email')?.touched &&
+              signUpForm.get('confirmEmail')?.touched &&
+              !signUpForm.get('email')?.errors?.email &&
+              (signUpForm.get('email')?.errors?.required ||
+                signUpForm.get('confirmEmail')?.errors?.required)
+            "
+          >
+            Campos requeridos
+          </div>
+          <div
+            class="error"
+            *ngIf="
+              !(
+                signUpForm.get('email')?.errors?.required ||
+                signUpForm.get('confirmEmail')?.errors?.required
+              ) &&
+              !signUpForm.get('email')?.errors?.email &&
+              signUpForm.get('email')?.errors?.differentEmails
+            "
+          >
+            Los correos electrónicos deben coincidir
+          </div>
+
+          <div class="input-container">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Correo electrónico"
+              (keyup)="compareEmails()"
             />
-            <i (click)="handleImageSubmit()" class="fa-solid fa-pen clickable"
-              ><input #imageInput type="file"
-            /></i>
+            <!-- Email input -->
+          </div>
+          <div class="input-container">
+            <input
+              type="email"
+              id="confirmEmail"
+              formControlName="confirmEmail"
+              placeholder="Confirmar correo electrónico"
+              (keyup)="compareEmails()"
+            />
+            <!-- Confirm Email input -->
+          </div>
+
+          <div class="buttons row full-width full-center gap-1">
+            <button class="poppins full-width" (click)="lastStep()">
+              ANTERIOR
+            </button>
+            <button class="poppins full-width" (click)="nextStep()">
+              SIGUIENTE
+            </button>
           </div>
         </div>
 
-        <div class="input-container">
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('username')?.invalid &&
-              signUpForm.get('username')?.touched
-            "
-          >
-            Este campo es requerido.
+        <div
+          class="step3 column full-center full-width gap-05"
+          *ngIf="getFormStep() === 3"
+        >
+          <div class="headlines row align-center space-between full-width">
+            <div class="text">
+              <h2>Paso 3</h2>
+              <p class="mulish">Completa tu perfil</p>
+            </div>
+            <div class="profile_img">
+              <img
+                #avatar
+                src="/assets/img/defaultpicture.jpg"
+                alt="Default profile picture"
+              />
+              <i (click)="handleImageSubmit()" class="fa-solid fa-pen clickable"
+                ><input
+                  #imageInput
+                  type="file"
+                  accept="image/jpg, image/jpeg, image/png"
+                  (change)="handleImageChange($event)"
+                />
+              </i>
+            </div>
           </div>
-          <input
-            type="text"
-            id="username"
-            formControlName="username"
-            placeholder="Nombre de usuario"
-          />
-        </div>
-        <!-- Username input -->
 
-        <div class="input-container">
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('address')?.invalid &&
-              signUpForm.get('address')?.touched
-            "
-          >
-            Este campo es requerido.
-          </div>
-          <input
-            type="text"
-            id="address"
-            formControlName="address"
-            placeholder="Dirección"
-          />
-        </div>
-        <!-- Address input -->
-
-        <div class="input-container">
-          <div
-            class="error"
-            *ngIf="
-              signUpForm.get('phone')?.errors?.required &&
-              signUpForm.get('phone')?.touched
-            "
-          >
-            Este campo es requerido.
-          </div>
-          <div
-            class="error"
-            *ngIf="
-              !signUpForm.get('phone')?.errors?.required &&
-              signUpForm.get('phone')?.touched &&
-              signUpForm.get('phone')?.errors?.pattern
-            "
-          >
-            El número de teléfono debe ser válido
-          </div>
-          <input
-            type="text"
-            id="phone"
-            formControlName="phone"
-            placeholder="Número de teléfono"
-          />
-        </div>
-        <!-- Telephone input -->
-
-        <div class="country column gap-05 full-width">
-          <label for="country">País</label>
-          <select
-            #countrySelect
-            id="country"
-            formControlName="country"
-            (change)="updateCountry($event); updateStates()"
-          >
-            <option
-              *ngFor="let country of this.location.countries"
-              [value]="country.iso2"
+          <div class="input-container">
+            <div
+              class="error"
+              *ngIf="
+                signUpForm.get('username')?.invalid &&
+                signUpForm.get('username')?.touched
+              "
             >
-              {{ country.name }}
-            </option>
-          </select>
-        </div>
-        <!-- Country input -->
+              Este campo es requerido.
+            </div>
+            <input
+              type="text"
+              id="username"
+              formControlName="username"
+              placeholder="Nombre de usuario"
+            />
+          </div>
+          <!-- Username input -->
 
-        <div class="closer_location row gap-05 full-width">
-          <div class="state column gap-05 full-width">
-            <label for="state">Estado</label>
-            <select #stateSelect id="state" (change)="updateCities($event)">
+          <div class="input-container">
+            <div
+              class="error"
+              *ngIf="
+                signUpForm.get('address')?.invalid &&
+                signUpForm.get('address')?.touched
+              "
+            >
+              Este campo es requerido.
+            </div>
+            <input
+              type="text"
+              id="address"
+              formControlName="address"
+              placeholder="Dirección"
+            />
+          </div>
+          <!-- Address input -->
+
+          <div class="input-container">
+            <div
+              class="error"
+              *ngIf="
+                signUpForm.get('phone')?.errors?.required &&
+                signUpForm.get('phone')?.touched
+              "
+            >
+              Este campo es requerido.
+            </div>
+            <div
+              class="error"
+              *ngIf="
+                !signUpForm.get('phone')?.errors?.required &&
+                signUpForm.get('phone')?.touched &&
+                signUpForm.get('phone')?.errors?.pattern
+              "
+            >
+              El número de teléfono debe ser válido
+            </div>
+            <input
+              type="text"
+              id="phone"
+              formControlName="phone"
+              placeholder="Número de teléfono"
+            />
+          </div>
+          <!-- Telephone input -->
+
+          <div class="country column gap-05 full-width">
+            <label for="country">País</label>
+            <select
+              #countrySelect
+              id="country"
+              formControlName="country"
+              (change)="updateCountry($event); updateStates()"
+            >
               <option
-                *ngFor="let state of this.location.states"
-                [value]="state.iso2"
+                *ngFor="let country of this.location.countries"
+                [value]="country.iso2"
+              >
+                {{ country.name }}
+              </option>
+            </select>
+          </div>
+          <!-- Country input -->
+
+          <div class="closer_location row gap-05 full-width">
+            <div class="state column gap-05 full-width">
+              <label for="state">Estado</label>
+              <select
+                #stateSelect
                 formControlName="state"
+                id="state"
+                (change)="updateCities($event)"
               >
-                {{ state.name }}
-              </option>
-            </select>
+                <option
+                  *ngFor="let state of this.location.states"
+                  [value]="state.iso2"
+                >
+                  {{ state.name }}
+                </option>
+              </select>
+            </div>
+            <!-- State input -->
+            <div class="city column gap-05 full-width">
+              <label for="city">Ciudad</label>
+              <select id="city" formControlName="city">
+                <option
+                  *ngFor="let city of this.location.cities"
+                  [value]="city.name"
+                >
+                  {{ city.name }}
+                </option>
+              </select>
+            </div>
+            <!-- City input -->
           </div>
-          <!-- State input -->
-          <div class="city column gap-05 full-width">
-            <label for="city">Ciudad</label>
-            <select id="city" formControlName="city">
-              <option
-                *ngFor="let city of this.location.cities"
-                [value]="city.name"
-              >
-                {{ city.name }}
-              </option>
-            </select>
-          </div>
-          <!-- City input -->
-        </div>
 
-        <button class="poppins full-width" (click)="handleSubmit()">
-          CREAR CUENTA
-        </button>
+          <button class="poppins full-width" (click)="nextStep()">
+            CREAR CUENTA
+          </button>
+        </div>
         <p class="terms_and_conditions clickable">
           Al Crear una Cuenta, aceptas nuestros <span>Términos</span> y
           <span>Condiciones</span>
         </p>
+      </form>
+    </div>
+    <div
+      [ngClass]="badFormatImage ? 'overlay' : 'hidden'"
+      id="overlay"
+      (click)="closeError()"
+    >
+      <div class="error-box" id="errorBox">
+        <h2>Error al subir tu imagen</h2>
+        <p>
+          Ha habido un error al subir tu imagen. Recuerda que tu avatar debe
+          seguir el formato .jpg, .jpeg ó .png, además de pesar menos de 5MB
+        </p>
       </div>
-    </form>
+    </div>
   </div>
   <div class="right"></div>
 </div>

@@ -1,0 +1,246 @@
+<div class="wrapper row full-center light_mode sizes">
+  <div class="sidebar left">
+    <div class="content space-between column">
+      <div class="top column">
+        <div id="profile" class="profile row align-center gap-05">
+          <img class="profile_picture" src="/assets/a.jpeg" />
+          <label class="username">tluzvid912</label>
+        </div>
+        <div class="nav column gap-1">
+          <div class="favorites">
+            <label class="title">Favoritos</label>
+            <ul>
+              <li class="row align-center gap-05">
+                <label>Overview</label>
+              </li>
+              <li class="row align-center gap-05">
+                <label>Espacios de trabajo</label>
+              </li>
+            </ul>
+            <!-- ToDo: Change this for user favorites -->
+          </div>
+
+          <div class="general">
+            <label class="title">General</label>
+            <ul>
+              <li class="row align-center gap-05">
+                <div class="logo">
+                  <img
+                    class="icon"
+                    src="/assets/icons/dashboard/overview.svg"
+                    alt="Overview Logo"
+                  />
+                </div>
+                <label>Overview</label>
+              </li>
+              <li class="row align-center gap-05">
+                <div class="logo">
+                  <img
+                    class="icon"
+                    src="/assets/icons/dashboard/workspaces.svg"
+                    alt="Workspaces Logo"
+                  />
+                </div>
+                <label>Espacios de trabajo</label>
+              </li>
+            </ul>
+          </div>
+
+          <div class="workspaces">
+            <label class="title">Espacios de trabajo</label>
+            <ul>
+              <li>
+                <label>Espacio de trabajo 1</label>
+              </li>
+              <li>
+                <label>Espacio de trabajo 2</label>
+              </li>
+              <li>
+                <label>Espacio de trabajo 3</label>
+              </li>
+            </ul>
+          </div>
+
+          <div class="aboutme">
+            <label class="title">Sobre mí</label>
+            <ul>
+              <li class="row align-center gap-05">
+                <div class="logo">
+                  <img
+                    class="icon"
+                    src="/assets/icons/dashboard/myaccount.svg"
+                    alt="My account Logo"
+                  />
+                </div>
+                <label>Mi cuenta</label>
+              </li>
+              <li class="row align-center gap-05">
+                <div class="logo">
+                  <img
+                    class="icon"
+                    src="/assets/icons/dashboard/social.svg"
+                    alt="Social Logo"
+                  />
+                </div>
+                <label>Social</label>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="logo bottom full-center">
+        <img
+          class="flowboard_logo"
+          src="/assets/logos/flowboard.svg"
+          alt="Flowboard Logo"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="main_content column space-between">
+    <div class="top_bar full-width p-1 space-between row align-center">
+      <div class="left gap-05 row align-center">
+        <img
+          class="icon"
+          src="/assets/icons/dashboard/sidebar.svg"
+          alt="Sidebar icon"
+        />
+        <img
+          class="icon"
+          src="/assets/icons/dashboard/star.svg"
+          alt="Favorite icon"
+        />
+        <label>Overview</label>
+      </div>
+      <div class="right row gap-05 align-center justify-right">
+        <img
+          class="icon"
+          src="/assets/icons/dashboard/sun.svg"
+          alt="Dark_Mode icon"
+        />
+        <img
+          class="icon"
+          src="/assets/icons/dashboard/bell.svg"
+          alt="Notifications icon"
+        />
+        <img
+          class="icon inverted"
+          src="/assets/icons/dashboard/sidebar.svg"
+          alt="Sidebar icon"
+        />
+      </div>
+    </div>
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  <div class="sidebar right">
+    <div class="content justify-center full-height">
+      <div class="nav column space-between align-left">
+        <div class="notifications">
+          <label>Notificaciones</label>
+          <ul>
+            <li class="notification">
+              <img class="icon img_notification_type" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="notification">
+              <img class="icon img_notification_type" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="notification">
+              <img class="icon img_notification_type" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="notification">
+              <img class="icon img_notification_type" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="tasks">
+          <label>Tareas</label>
+
+          <ul>
+            <li class="task">
+              <img class="icon img_task" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="task">
+              <img class="icon img_task" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="task">
+              <img class="icon img_task" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="task">
+              <img class="icon img_task" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="friends">
+          <label>Amigos</label>
+
+          <ul>
+            <li class="friend">
+              <img class="icon img_friend" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="friend">
+              <img class="icon img_friend" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="friend">
+              <img class="icon img_friend" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+            <li class="friend">
+              <img class="icon img_friend" />
+              <div class="info">
+                <label>You fixed a bug</label>
+                <p class="date">Just now</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

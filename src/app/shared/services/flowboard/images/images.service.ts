@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/development';
 import { ApiService } from '../../api/api.service';
+import { Image } from 'src/app/shared/types/images';
 import { Observable } from 'rxjs';
-import { User } from 'src/app/shared/types/user';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
-export class UsersService {
+export class ImagesService {
   private BASE_URL = environment.flowboardAPI.base_url;
-  private USER_ENDPOINT = environment.flowboardAPI.endpoints.user;
+  private IMAGE_ENDPOINT = environment.flowboardAPI.endpoints.image;
   private API_KEY = environment.flowboardAPI.apikey.key;
   private headers: Headers;
 
@@ -20,19 +19,13 @@ export class UsersService {
     this.headers.append(this.API_KEY.key, this.API_KEY.value);
   }
 
-  postUser(user: User): Observable<User> {
-    const url = `${this.BASE_URL}${this.USER_ENDPOINT}`;
-    const response = this.api.post<User>(url, user, this.headers);
-    console.log(user);
-    response.subscribe(
-      (response: any) => {
-        console.log(response);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+  postImage(image: FormData | File): Observable<Image> {
+    const url = `${this.BASE_URL}${this.IMAGE_ENDPOINT}`;
+    return this.api.post<Image>(url, image, this.headers);
+  }
 
-    return response;
+  getImage(imageId: number): Observable<Image> {
+    const url = `${this.BASE_URL}${this.IMAGE_ENDPOINT}/${imageId}`;
+    return this.api.get<Image>(url, this.headers);
   }
 }

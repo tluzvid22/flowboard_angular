@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   CRYPTO_KEY:
-    'IluRkUtX08Mh7aspQ7paC8lhRvTe19azCHcutbvHGXTUaIvFDdJyR6qGysMMma6A',
+    'UsJgGzSSP+PCoB9Tw0O7k+94yMR4UWlthDCeV231XfroCewolyY5EpKxU1Ur3zdT',
   countriesAPI: {
     base_url: 'https://api.countrystatecity.in/v1',
     apikey: {
@@ -29,6 +29,7 @@ export const environment = {
     endpoints: {
       user: '/User',
       table: '/table',
+      image: '/Image',
     },
   },
 };

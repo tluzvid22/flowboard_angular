@@ -1,0 +1,42 @@
+@import "src/styles/variables.scss";
+.wrapper {
+  width: 100%;
+  height: 100%;
+  background-color: $secondary_color;
+  padding: 1rem;
+  border-radius: 15px;
+
+  ul {
+    list-style: none;
+    overflow-y: auto;
+    max-height: 75vh;
+    justify-content: start;
+  }
+
+  h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    color: $primary_color;
+  }
+
+  .add_task {
+    border-radius: 5px;
+    background-color: $primary_10;
+    color: $primary_color;
+    font-size: 13px;
+    padding: 0.5rem;
+  }
+
+  .add_task:hover {
+    box-shadow: inset 0px 0px 0px 2px $primary_color;
+    background-color: $primary_20;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 0.6rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}

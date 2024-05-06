@@ -12,3 +12,62 @@
   --article4: #011627;
   --article4bg: #161c2d;
 }
+
+.sizes {
+  --fs-600: 2rem;
+  --fs-500: 1rem;
+  --fs-400: 0.8rem;
+  --fs-xl: 2rem;
+}
+@media (max-width: 1275px) {
+  .sizes {
+    --fs-600: 1rem;
+    --fs-500: 0.75rem;
+    --fs-400: 0.6rem;
+    --fs-xl: 1.3rem;
+  }
+}
+
+.light_mode {
+  --primary-color: #fff;
+  --secondary-color: #1c1c1c;
+  --subtitles: rgba(0, 0, 0, 0.1);
+}
+
+.dark_mode {
+  --primary-color: #1c1c1c;
+  --secondary-color: #fff;
+}
+
+$primary_color: var(--primary-color);
+$secondary_color: var(--secondary-color);
+$secondary_95: color-mix(in srgb, $secondary_color, transparent 5%);
+$secondary_90: color-mix(in srgb, $secondary_color, transparent 10%);
+$secondary_80: color-mix(in srgb, $secondary_color, transparent 20%);
+$secondary_70: color-mix(in srgb, $secondary_color, transparent 30%);
+$secondary_60: color-mix(in srgb, $secondary_color, transparent 40%);
+$secondary_50: color-mix(in srgb, $secondary_color, transparent 50%);
+$secondary_40: color-mix(in srgb, $secondary_color, transparent 60%);
+$secondary_30: color-mix(in srgb, $secondary_color, transparent 70%);
+$secondary_20: color-mix(in srgb, $secondary_color, transparent 80%);
+$secondary_15: color-mix(in srgb, $secondary_color, transparent 85%);
+$secondary_10: color-mix(in srgb, $secondary_color, transparent 90%);
+$secondary_5: color-mix(in srgb, $secondary_color, transparent 95%);
+$primary_95: color-mix(in srgb, $primary_color, transparent 5%);
+$primary_90: color-mix(in srgb, $primary_color, transparent 10%);
+$primary_80: color-mix(in srgb, $primary_color, transparent 20%);
+$primary_70: color-mix(in srgb, $primary_color, transparent 30%);
+$primary_60: color-mix(in srgb, $primary_color, transparent 40%);
+$primary_50: color-mix(in srgb, $primary_color, transparent 50%);
+$primary_40: color-mix(in srgb, $primary_color, transparent 60%);
+$primary_30: color-mix(in srgb, $primary_color, transparent 70%);
+$primary_20: color-mix(in srgb, $primary_color, transparent 80%);
+$primary_15: color-mix(in srgb, $primary_color, transparent 85%);
+$primary_10: color-mix(in srgb, $primary_color, transparent 90%);
+$primary_5: color-mix(in srgb, $primary_color, transparent 95%);
+$blue: #e3f5ff;
+$purple: #e5ecf6;
+$fs-600: var(--fs-600);
+$fs-500: var(--fs-500);
+$fs-400: var(--fs-400);
+$fs-xl: var(--fs-xl);

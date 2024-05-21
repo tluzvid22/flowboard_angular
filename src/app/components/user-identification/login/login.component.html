@@ -6,7 +6,10 @@
       alt="Flowboard logo"
       [routerLink]="['/home']"
     />
-    <div [routerLink]="['/signup']" class="register row full-center p-1 gap-05">
+    <div
+      [routerLink]="['/signup/step/1']"
+      class="register row full-center p-1 gap-05"
+    >
       <a>No tienes una cuenta?</a>
       <button class="p-05">Regístrate</button>
     </div>
@@ -76,9 +79,12 @@
     </div>
     <!-- Password input -->
 
+    <div *ngIf="isLoginFailed" class="error login_failed full-center">
+      El usuario no existe.
+    </div>
     <div class="additional row space-between full-width">
       <div class="checkbox row gap-05 full-center">
-        <input type="checkbox" id="rememberMe" />
+        <input type="checkbox" id="rememberMe" checked />
         <label for="rememberMe">Recuérdame</label>
       </div>
 

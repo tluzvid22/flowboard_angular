@@ -1,47 +1,96 @@
-<div class="wrapper row full-center light_mode sizes">
-  <div class="sidebar left">
+<div
+  class="wrapper row full-center sizes"
+  [ngClass]="this.isDarkModeOn ? 'dark_mode' : 'light_mode'"
+  (click)="isLogOutTabVisible = false"
+>
+  <div *ngIf="this.isSidebarLeftVisible" class="sidebar left">
     <div class="content space-between column">
-      <div class="top column">
-        <div id="profile" class="profile row align-center gap-05">
-          <img class="profile_picture" src="/assets/a.jpeg" />
-          <label class="username">tluzvid912</label>
+      <div #navbar class="top column navbar">
+        <div
+          id="profile"
+          (click)="
+            $event.stopPropagation(); isLogOutTabVisible = !isLogOutTabVisible
+          "
+          class="profile row space-between align-center"
+        >
+          <div class="left row align-center gap-05">
+            <img
+              #profilePicture
+              class="profile_picture"
+              src="/assets/img/defaultpicture.jpg"
+            />
+            <label #username class="username clickable"></label>
+          </div>
+          <div class="right clickable">
+            <i
+              class="{{
+                isLogOutTabVisible
+                  ? 'fa-solid fa-chevron-right -right'
+                  : 'fa-solid fa-chevron-right -down'
+              }}"
+            ></i>
+          </div>
         </div>
+        <ul *ngIf="isLogOutTabVisible" class="logout_tab full-center">
+          <li class="clickable" (click)="logout()">Cerrar sesión</li>
+        </ul>
         <div class="nav column gap-1">
           <div class="favorites">
             <label class="title">Favoritos</label>
             <ul>
-              <li class="row align-center gap-05">
+              <li
+                (click)="handleNavSelect($event)"
+                class="navElement row align-center gap-05"
+              >
                 <label>Overview</label>
               </li>
-              <li class="row align-center gap-05">
+              <li
+                (click)="handleNavSelect($event)"
+                class="navElement row align-center gap-05"
+              >
                 <label>Espacios de trabajo</label>
               </li>
             </ul>
-            <!-- ToDo: Change this for user favorites -->
           </div>
 
           <div class="general">
             <label class="title">General</label>
             <ul>
-              <li class="row align-center gap-05">
+              <li
+                (click)="handleNavSelect($event)"
+                class="navElement row align-center gap-05"
+                routerLink="overview"
+              >
                 <div class="logo">
                   <img
                     class="icon"
-                    src="/assets/icons/dashboard/overview.svg"
+                    [src]="
+                      this.isDarkModeOn
+                        ? '/assets/icons/dashboard/dark/overview.svg'
+                        : '/assets/icons/dashboard/light/overview.svg'
+                    "
                     alt="Overview Logo"
                   />
                 </div>
-                <label>Overview</label>
+                <label class="clickable">Overview</label>
               </li>
-              <li class="row align-center gap-05">
+              <li
+                (click)="handleNavSelect($event)"
+                class="navElement row align-center gap-05"
+                routerLink="workspaces"
+              >
                 <div class="logo">
                   <img
                     class="icon"
-                    src="/assets/icons/dashboard/workspaces.svg"
+                    [src]="
+                      this.isDarkModeOn
+                        ? '/assets/icons/dashboard/dark/workspaces.svg'
+                        : '/assets/icons/dashboard/light/workspaces.svg'
+                    "
                     alt="Workspaces Logo"
                   />
                 </div>
-                <label>Espacios de trabajo</label>
+                <label class="clickable">Espacios de trabajo</label>
               </li>
             </ul>
           </div>
@@ -49,14 +98,13 @@
           <div class="workspaces">
             <label class="title">Espacios de trabajo</label>
             <ul>
-              <li>
-                <label>Espacio de trabajo 1</label>
-              </li>
-              <li>
-                <label>Espacio de trabajo 2</label>
-              </li>
-              <li>
-                <label>Espacio de trabajo 3</label>
+              <li
+                (click)="handleNavSelect($event)"
+                class="navElement clickable"
+                *ngFor="let workspace of workspaces.slice(0, 3)"
+                (click)="redirectToWorkspace(workspace.id!)"
+              >
+                <label>{{ workspace.name }}</label>
               </li>
             </ul>
           </div>
@@ -64,21 +112,36 @@
           <div class="aboutme">
             <label class="title">Sobre mí</label>
             <ul>
-              <li class="row align-center gap-05">
+              <li
+                (click)="handleNavSelect($event)"
+                class="navElement row align-center gap-05"
+              >
                 <div class="logo">
                   <img
                     class="icon"
-                    src="/assets/icons/dashboard/myaccount.svg"
+                    [src]="
+                      this.isDarkModeOn
+                        ? '/assets/icons/dashboard/dark/myaccount.svg'
+                        : '/assets/icons/dashboard/light/myaccount.svg'
+                    "
                     alt="My account Logo"
                   />
                 </div>
                 <label>Mi cuenta</label>
               </li>
-              <li class="row align-center gap-05">
+              <li
+                (click)="handleNavSelect($event)"
+                [routerLink]="['social']"
+                class="navElement row align-center gap-05"
+              >
                 <div class="logo">
                   <img
                     class="icon"
-                    src="/assets/icons/dashboard/social.svg"
+                    [src]="
+                      this.isDarkModeOn
+                        ? '/assets/icons/dashboard/dark/social.svg'
+                        : '/assets/icons/dashboard/light/social.svg'
+                    "
                     alt="Social Logo"
                   />
                 </div>
@@ -90,8 +153,9 @@
       </div>
       <div class="logo bottom full-center">
         <img
-          class="flowboard_logo"
+          class="flowboard_logo clickable"
           src="/assets/logos/flowboard.svg"
+          [routerLink]="['/home']"
           alt="Flowboard Logo"
         />
       </div>
@@ -102,30 +166,65 @@
       <div class="left gap-05 row align-center">
         <img
           class="icon"
-          src="/assets/icons/dashboard/sidebar.svg"
+          [src]="
+            this.isDarkModeOn
+              ? '/assets/icons/dashboard/dark/sidebar.svg'
+              : '/assets/icons/dashboard/light/sidebar.svg'
+          "
+          (click)="showSidebarLeft()"
           alt="Sidebar icon"
         />
         <img
           class="icon"
-          src="/assets/icons/dashboard/star.svg"
+          [src]="
+            this.isDarkModeOn
+              ? '/assets/icons/dashboard/dark/star.svg'
+              : '/assets/icons/dashboard/light/star.svg'
+          "
           alt="Favorite icon"
         />
-        <label>Overview</label>
+
+        <label #title>Title</label>
       </div>
       <div class="right row gap-05 align-center justify-right">
         <img
           class="icon"
-          src="/assets/icons/dashboard/sun.svg"
+          [src]="
+            this.isDarkModeOn
+              ? '/assets/icons/dashboard/dark/sun.svg'
+              : '/assets/icons/dashboard/light/sun.svg'
+          "
           alt="Dark_Mode icon"
+          (click)="changeLightMode()"
         />
         <img
           class="icon"
-          src="/assets/icons/dashboard/bell.svg"
+          [src]="
+            this.isDarkModeOn
+              ? '/assets/icons/dashboard/dark/bell.svg'
+              : '/assets/icons/dashboard/light/bell.svg'
+          "
           alt="Notifications icon"
         />
         <img
+          *ngIf="this.isWorkspaceAbleToDelete"
+          class="icon"
+          [src]="
+            this.isDarkModeOn
+              ? '/assets/icons/dashboard/dark/trash.svg'
+              : '/assets/icons/dashboard/light/trash.svg'
+          "
+          alt="Trash icon"
+          (click)="deleteWorkspace()"
+        />
+        <img
           class="icon inverted"
-          src="/assets/icons/dashboard/sidebar.svg"
+          [src]="
+            this.isDarkModeOn
+              ? '/assets/icons/dashboard/dark/sidebar.svg'
+              : '/assets/icons/dashboard/light/sidebar.svg'
+          "
+          (click)="showSidebarRight()"
           alt="Sidebar icon"
         />
       </div>
@@ -134,7 +233,7 @@
       <router-outlet></router-outlet>
     </div>
   </div>
-  <div class="sidebar right">
+  <div *ngIf="this.isSidebarRightVisible" class="sidebar right">
     <div class="content justify-center full-height">
       <div class="nav column space-between align-left">
         <div class="notifications">

@@ -1,12 +1,51 @@
-<div class="wrapper column">
+<div class="wrapper column" (click)="this.isAddTaskClicked = false">
   <h3 class="title">{{ this.list.name }}</h3>
   <ul class="justify-center gap-05 column">
     <li *ngFor="let task of this.list.tasks">
       <app-task class="task" [task]="task"></app-task>
     </li>
-    <li class="add_task row gap-05 full-center p-1 clickable">
-      <i class="fa-solid fa-plus"></i>
-      <p>Añade una tarea</p>
+    <li
+      class="add_task {{ !this.isAddTaskClicked ? 'clickable' : '' }}"
+      (click)="$event.stopPropagation(); this.isAddTaskClicked = true"
+    >
+      <div *ngIf="this.isAddTaskClicked" class="clicked column gap-05">
+        <textarea
+          #taskTitle
+          type="text"
+          maxlength="70"
+          (keydown.enter)="
+            $event.preventDefault();
+            addTask(taskTitle.value);
+            taskTitle.value = '';
+            taskTitle.focus()
+          "
+          placeholder="Añade el título de la tarea"
+        ></textarea>
+        <div class="buttons row gap-05 align-center">
+          <button
+            (click)="
+              $event.stopPropagation();
+              addTask(taskTitle.value);
+              taskTitle.value = '';
+              taskTitle.focus()
+            "
+            type="submit"
+          >
+            Añadir tarea
+          </button>
+          <i
+            (click)="$event.stopPropagation(); this.isAddTaskClicked = false"
+            class="fa-solid fa-xmark clickable"
+          ></i>
+        </div>
+      </div>
+      <div
+        *ngIf="!this.isAddTaskClicked"
+        class="not_clicked row gap-05 full-center clickable"
+      >
+        <i class="fa-solid fa-plus clickable"></i>
+        <p>Añade una tarea</p>
+      </div>
     </li>
   </ul>
 </div>

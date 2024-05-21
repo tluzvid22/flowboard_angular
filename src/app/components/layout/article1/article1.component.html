@@ -10,12 +10,18 @@
 
     <div class="register">
       <div class="input-container">
-        <input type="email" id="email" placeholder="Introduce tu email" />
+        <input
+          #emailInput
+          type="email"
+          id="email"
+          (keydown.enter)="redirectToLogin(emailInput.value)"
+          placeholder="Introduce tu email"
+        />
         <label for="email">
           <i class="fa-regular fa-envelope"></i>
         </label>
       </div>
-      <button [routerLink]="['/signup/step/1']">Apúntate</button>
+      <button (click)="redirectToLogin(emailInput.value)">Apúntate</button>
     </div>
 
     <div class="logos">

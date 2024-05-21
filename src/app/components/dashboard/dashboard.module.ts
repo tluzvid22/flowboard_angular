@@ -7,6 +7,9 @@ import { WorkspacesComponent } from './workspaces/workspaces.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { ListComponent } from './workspace/list/list.component';
 import { TaskComponent } from './workspace/task/task.component';
+import { EdittaskComponent } from './workspace/task/edittask/edittask.component';
+import { SocialComponent } from './social/social.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   {
@@ -26,7 +29,9 @@ const routes: Routes = [
       {
         path: 'workspaces/workspace/:id',
         component: WorkspaceComponent,
+        children: [{ path: 'task/:id/edit', component: EdittaskComponent }],
       },
+      { path: 'social', component: SocialComponent },
     ],
   },
 ];
@@ -37,12 +42,14 @@ const routes: Routes = [
     OverviewComponent,
     WorkspacesComponent,
     WorkspaceComponent,
+    SocialComponent,
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
     ListComponent,
     TaskComponent,
+    ReactiveFormsModule,
   ],
 })
 export class DashboardModule {}

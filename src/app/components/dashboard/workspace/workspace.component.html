@@ -1,27 +1,51 @@
-<div class="wrapper full-center">
+<div class="wrapper full-center" (click)="this.isAddListClicked = false">
   <ul class="content row">
     <li class="list" *ngFor="let list of this.lists">
       <app-list [list]="list"></app-list>
     </li>
-    <li class="add_list">
+    <li
+      class="add_list full-center {{
+        !this.isAddListClicked ? 'clickable' : ''
+      }}"
+      (click)="$event.stopPropagation(); this.isAddListClicked = true"
+    >
       <div *ngIf="this.isAddListClicked" class="clicked column gap-05">
-        <input type="text" />
+        <input
+          type="text"
+          #listTitle
+          maxlength="25"
+          (keydown.enter)="
+            addList(listTitle.value); listTitle.value = ''; listTitle.focus()
+          "
+          placeholder="Añade el título de la lista"
+        />
         <div class="buttons row gap-05 align-center">
-          <button (click)="addList()">Añadir lista</button>
+          <button
+            (click)="
+              $event.stopPropagation();
+              addList(listTitle.value);
+              listTitle.value = '';
+              listTitle.focus()
+            "
+          >
+            Añadir lista
+          </button>
           <i
-            (click)="this.isAddListClicked = !this.isAddListClicked"
+            (click)="$event.stopPropagation(); this.isAddListClicked = false"
             class="fa-solid fa-xmark clickable"
           ></i>
         </div>
       </div>
       <div
         *ngIf="!this.isAddListClicked"
-        (click)="this.isAddListClicked = !this.isAddListClicked"
-        class="not_clicked row gap-05 full-center p-1 clickable"
+        class="not_clicked row gap-05 full-center p-1"
       >
-        <i class="fa-solid fa-plus clickable"></i>
+        <i class="fa-solid fa-plus"></i>
         <p>Añade una lista</p>
       </div>
     </li>
   </ul>
+  <div *ngIf="this.getIsOverlayOn()" class="overlay">
+    <router-outlet></router-outlet>
+  </div>
 </div>

@@ -28,6 +28,9 @@
   }
 }
 
+$black: #1c1c1c;
+$white: #fff;
+
 .light_mode {
   --primary-color: #fff;
   --secondary-color: #1c1c1c;
@@ -35,7 +38,7 @@
 }
 
 .dark_mode {
-  --primary-color: #1c1c1c;
+  --primary-color: rgb(28, 28, 28);
   --secondary-color: #fff;
 }
 

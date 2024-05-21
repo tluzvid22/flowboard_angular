@@ -1,8 +1,9 @@
 <div
   class="wrapper row align-center space-between"
   (mouseenter)="this.onFocus = true"
+  (click)="editTask()"
   (mouseleave)="this.onFocus = false"
 >
   <h4 class="title">{{ this.task.name }}</h4>
-  <i *ngIf="this.onFocus" (click)="editTask()" class="fa-solid fa-pen"></i>
+  <i *ngIf="this.onFocus" class="fa-solid fa-trash"></i>
 </div>

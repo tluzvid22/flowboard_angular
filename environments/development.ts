@@ -27,9 +27,28 @@ export const environment = {
       },
     },
     endpoints: {
-      user: '/User',
-      table: '/table',
-      image: '/Image',
+      user: {
+        user: '/User',
+        emailExists: '/User/email/',
+        usernameExists: '/User/username/',
+        token: '/User/token/',
+      },
+      token: {
+        token: '/Token',
+        deleteTokenByTokenValue: '/Token/token/',
+        deleteTokenByUserId: '/Token/user/',
+      },
+      file: {
+        file: '/File',
+        fileContentById: '/File/content/',
+        filesByTask: '/File/task/',
+      },
+      list: { list: '/List', listsByWorkspace: '/List/workspace/' },
+      task: { task: '/Task', tasksByList: '/Task/list/' },
+      workspace: {
+        workspace: '/Workspace',
+        workspacesByUser: '/Workspace/user/',
+      },
     },
   },
 };

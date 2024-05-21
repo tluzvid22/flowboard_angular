@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, ViewChild, inject } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,28 +12,23 @@ import {
   RouterLink,
   RouterLinkActive,
 } from '@angular/router';
-import { Sign } from 'crypto';
-import {
-  Observable,
-  catchError,
-  delay,
-  switchMap,
-  throwError,
-  timer,
-} from 'rxjs';
+import { catchError, switchMap, throwError } from 'rxjs';
+import { CookieServiceService } from 'src/app/shared/services/cookieservice/cookieservice.service';
 import { CountriesAPIService } from 'src/app/shared/services/countries/countries.service';
-import { ImagesService } from 'src/app/shared/services/flowboard/images/images.service';
 import { UsersService } from 'src/app/shared/services/flowboard/users/users.service';
+import { WorkspacesService } from 'src/app/shared/services/flowboard/workspaces/workspaces.service';
 import Security from 'src/app/shared/services/security/security.service';
-import { City, Country, State } from 'src/app/shared/types/countries';
-import { Image } from 'src/app/shared/types/images';
+import { Country, State } from 'src/app/shared/types/countries';
 import { User } from 'src/app/shared/types/user';
+import { Files } from 'src/app/shared/types/workspaces';
+import { EmailAsyncValidator } from 'src/app/validators/emailValidator';
 import { PasswordValidator } from 'src/app/validators/passwordValidator';
-
-const passwordLength: number = 8;
-const phoneValidPattern: string =
-  '^[+]?[(]?[0-9]{2,3}[)]?[-. ]?[0-9]{3}[-. ]?[0-9]{3,6}$';
-const maxImageSize = 5;
+import { UsernameAsyncValidator } from 'src/app/validators/usernameValidator';
+import {
+  passwordLength,
+  phoneValidPattern,
+  maxImageSize,
+} from 'src/constants/input';
 
 @Component({
   selector: 'app-signup',
@@ -50,11 +45,12 @@ export class SignupComponent {
 
   public signUpForm: FormGroup;
   public isPasswordVisible: boolean = false;
-  public static formStep: number = 3;
+  public static formStep: number = 1;
   public passwordStrength: number = 1;
   public router: Router = inject(Router);
   public countrySelected: string = 'AF';
   public stateSelected: string = 'BDS';
+  public image: Files | any;
   public data: User = {
     name: '',
     lastName: '',
@@ -67,10 +63,8 @@ export class SignupComponent {
     phone: '',
     country: '',
     state: '',
-    city: '',
   };
-  public image: Image = { id: 0, file: new File([], '', undefined) };
-  public location: { countries: Country[]; states: State[]; cities: City[] };
+  public location: { countries: Country[]; states: State[] };
   public badFormatImage: boolean = false;
 
   constructor(
@@ -79,7 +73,8 @@ export class SignupComponent {
     private countriesService: CountriesAPIService,
     private security: Security,
     private usersService: UsersService,
-    private imageService: ImagesService
+    private imageService: WorkspacesService,
+    private cookiesService: CookieServiceService
   ) {
     const savedData = localStorage.getItem('SignUpInfo');
     if (savedData !== null) {
@@ -94,12 +89,21 @@ export class SignupComponent {
         '',
         [Validators.required, PasswordValidator(passwordLength)],
       ],
-      email: [this.data.email, [Validators.required, Validators.email]],
+      email: [
+        this.data.email,
+        [Validators.required, Validators.email],
+        [EmailAsyncValidator(this.usersService)],
+      ],
       confirmEmail: [
         this.data.confirmEmail,
         [Validators.required, Validators.email],
+        [EmailAsyncValidator(this.usersService)],
       ],
-      username: [this.data.username, [Validators.required]], //ToDo: Add Validation that checks wether user exist in database
+      username: [
+        this.data.username,
+        [Validators.required],
+        [UsernameAsyncValidator(this.usersService)],
+      ], //ToDo: Add Validation that checks wether user exist in database
       address: [this.data.address, [Validators.required]],
       phone: [
         this.data.phone,
@@ -107,11 +111,16 @@ export class SignupComponent {
       ],
       country: ['', Validators.required],
       state: ['', Validators.required],
-      city: ['', Validators.required],
     });
     SignupComponent.formStep = +this.activatedRoute.snapshot.params['id'];
+    this.activatedRoute.queryParams.subscribe((params) => {
+      if (params['email'] !== undefined) {
+        this.data.email = params['email'];
+        this.data.confirmEmail = params['email'];
+      }
+    });
 
-    this.location = { countries: [], states: [], cities: [] };
+    this.location = { countries: [], states: [] };
     this.fetchLocationData();
   }
 
@@ -119,7 +128,10 @@ export class SignupComponent {
     const password = this.security.decrypt(
       JSON.parse(localStorage.getItem('SignUpInfo')!).password
     );
-    const imageId: number = await this.uploadImage(this.image.file);
+    let imageId = 1;
+    if (this.image !== undefined) {
+      imageId = await this.uploadImage(this.image);
+    }
 
     if (imageId === -1) {
       this.showError();
@@ -132,8 +144,17 @@ export class SignupComponent {
       imageid: imageId,
     };
 
-    this.usersService.postUser(user);
-    //post new user
+    this.usersService.postUser(user).subscribe(
+      (response: User) => {
+        localStorage.removeItem('SignUpInfo');
+        this.cookiesService.clearTokenFromTokenValue();
+        this.router.navigate(['/login']);
+      },
+      (error) => {
+        this.showError();
+        console.log(error);
+      }
+    ); //post new user
   }
 
   /**
@@ -141,13 +162,19 @@ export class SignupComponent {
    * @returns id of the uploades image, -1 if there was an error
    */
   private uploadImage(file: File): Promise<number> {
+    const extensionIndex = file.name.lastIndexOf('.');
+    const name = file.name.substring(0, extensionIndex);
+    const fileType = file.name.substring(extensionIndex);
+
     return new Promise<number>((resolve, reject) => {
-      const formData: FormData = new FormData();
-      formData.append('file', file);
-      const response = this.imageService.postImage(formData);
+      const response = this.imageService.postFile({
+        data: file,
+        fileType: fileType,
+        name: name,
+      });
       response.subscribe({
-        next: (image: Image) => {
-          resolve(image.id);
+        next: (image: Files) => {
+          resolve(image.id as number);
         },
         error: (error) => {
           console.error('Error fetching data:', error);
@@ -206,8 +233,7 @@ export class SignupComponent {
         this.signUpForm.get('address')?.errors !== null ||
         this.signUpForm.get('phone')?.errors !== null ||
         this.signUpForm.get('country')?.errors !== null ||
-        this.signUpForm.get('state')?.errors !== null ||
-        this.signUpForm.get('city')?.errors !== null;
+        this.signUpForm.get('state')?.errors !== null;
     }
     return hasErrors;
   }
@@ -293,7 +319,6 @@ export class SignupComponent {
       this.data.phone = this.signUpForm.get('phone')?.value;
       this.data.country = this.signUpForm.get('country')?.value;
       this.data.state = this.signUpForm.get('state')?.value;
-      this.data.city = this.signUpForm.get('city')?.value;
       //step3
     }
     localStorage.setItem('SignUpInfo', JSON.stringify(this.data));
@@ -309,23 +334,18 @@ export class SignupComponent {
           );
           return this.countriesService.getStates(this.countrySelected);
         }),
-        switchMap((states: State[]) => {
-          this.location.states = states.sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-          return this.countriesService.getCities(
-            this.countrySelected,
-            this.stateSelected
-          );
-        }),
         catchError((error) => {
           console.error('Error fetching data:', error);
           return throwError(error);
         })
       )
-      .subscribe((cities: City[]) => {
-        this.location.cities = cities.sort((a, b) =>
+      .subscribe((states: State[]) => {
+        this.location.states = states.sort((a, b) =>
           a.name.localeCompare(b.name)
+        );
+        return this.countriesService.getCities(
+          this.countrySelected,
+          this.stateSelected
         );
       });
   }
@@ -349,32 +369,6 @@ export class SignupComponent {
         this.location.states = states.sort((a, b) =>
           a.name.localeCompare(b.name)
         );
-
-        this.updateCities(null);
-      });
-  }
-
-  updateCities(event: any) {
-    if (!event) {
-      this.stateSelected = this.location.states[1].iso2;
-    } else {
-      const selectElement = event.target as HTMLSelectElement;
-      this.stateSelected = selectElement.value;
-    }
-    //handle cases when cities are updated from a change on city select / state select
-
-    this.countriesService
-      .getCities(this.countrySelected, this.stateSelected)
-      .pipe(
-        catchError((error) => {
-          console.error('Error fetching cities:', error);
-          return throwError(error);
-        })
-      )
-      .subscribe((cities: City[]) => {
-        this.location.cities = cities.sort((a, b) =>
-          a.name.localeCompare(b.name)
-        );
       });
   }
   //countriesAPI
@@ -394,7 +388,7 @@ export class SignupComponent {
     }
     //restrict not valid images
 
-    this.image.file = file;
+    this.image = file;
     //save image in user saved data
 
     this.avatar.nativeElement.src = URL.createObjectURL(file);

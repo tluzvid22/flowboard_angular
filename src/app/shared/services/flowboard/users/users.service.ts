@@ -21,18 +21,32 @@ export class UsersService {
   }
 
   postUser(user: User): Observable<User> {
-    const url = `${this.BASE_URL}${this.USER_ENDPOINT}`;
-    const response = this.api.post<User>(url, user, this.headers);
-    console.log(user);
-    response.subscribe(
-      (response: any) => {
-        console.log(response);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+    const url = `${this.BASE_URL}${this.USER_ENDPOINT.user}`;
+    return this.api.post<User>(url, user, this.headers);
+  }
 
-    return response;
+  getUser(email: string, password: string): Observable<User> {
+    const url = `${this.BASE_URL}${this.USER_ENDPOINT.user}/${email}/${password}`;
+    return this.api.get<User>(url, this.headers);
+  }
+
+  getUserById(user_id: number): Observable<User> {
+    const url = `${this.BASE_URL}${this.USER_ENDPOINT.user}/${user_id}`;
+    return this.api.get<User>(url, this.headers);
+  }
+
+  getUserByToken(token: string): Observable<User[]> {
+    const url = `${this.BASE_URL}${this.USER_ENDPOINT.token}${token}`;
+    return this.api.get<User[]>(url, this.headers);
+  }
+
+  getUsernameExists(username: string): Observable<boolean> {
+    const url = `${this.BASE_URL}${this.USER_ENDPOINT.usernameExists}${username}`;
+    return this.api.get<boolean>(url, this.headers);
+  }
+
+  getEmailExists(email: string) {
+    const url = `${this.BASE_URL}${this.USER_ENDPOINT.emailExists}${email}`;
+    return this.api.get<boolean>(url, this.headers);
   }
 }

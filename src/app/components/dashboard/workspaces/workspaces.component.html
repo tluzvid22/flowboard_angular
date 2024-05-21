@@ -1,1 +1,51 @@
-<p>workspaces works!</p>
+<div class="wrapper full-height full-width full-center">
+  <ul class="row wrap gap-05">
+    <li
+      class="workspace clickable full-center"
+      *ngFor="let workspace of this.workspaces; let i = index"
+      routerLink="workspace/{{ workspace.id }}"
+      [ngClass]="i % 2 === 0 ? 'blue' : 'purple'"
+    >
+      {{ workspace.name }}
+    </li>
+    <li
+      class="add_workspace full-center {{
+        !this.isAddWorkspaceClicked ? 'clickable' : ''
+      }}"
+      [ngClass]="this.workspaces!.length % 2 === 0 ? 'blue' : 'purple'"
+      (click)="this.isAddWorkspaceClicked = true"
+    >
+      <div *ngIf="this.isAddWorkspaceClicked" class="clicked column gap-05">
+        <input
+          type="text"
+          #workspaceTitle
+          maxlength="25"
+          placeholder="Título del workspace"
+          (keydown.enter)="addWorkspace(workspaceTitle.value)"
+        />
+        <div class="buttons row gap-05 align-center">
+          <button
+            (click)="
+              $event.stopPropagation(); addWorkspace(workspaceTitle.value)
+            "
+          >
+            Añadir workspace
+          </button>
+          <i
+            (click)="
+              $event.stopPropagation(); this.isAddWorkspaceClicked = false
+            "
+            class="fa-solid fa-xmark clickable"
+          ></i>
+        </div>
+      </div>
+      <div
+        *ngIf="!this.isAddWorkspaceClicked"
+        class="not_clicked row gap-05 full-center p-1"
+      >
+        <i class="fa-solid fa-plus"></i>
+        <p>Añade un workspace</p>
+      </div>
+    </li>
+  </ul>
+</div>

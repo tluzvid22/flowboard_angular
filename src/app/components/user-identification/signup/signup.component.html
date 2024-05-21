@@ -188,6 +188,22 @@
             Los correos electrónicos deben coincidir
           </div>
 
+          <div
+            class="error"
+            *ngIf="
+              (!(
+                signUpForm.get('email')?.errors?.required ||
+                signUpForm.get('confirmEmail')?.errors?.required
+              ) &&
+                !signUpForm.get('email')?.errors?.email &&
+                !signUpForm.get('email')?.errors?.differentEmails &&
+                signUpForm.get('email')?.errors?.emailExists) ||
+              signUpForm.get('confirmEmail')?.errors?.emailExists
+            "
+          >
+            El correo electronico ya existe
+          </div>
+
           <div class="input-container">
             <input
               type="email"
@@ -238,7 +254,7 @@
                 ><input
                   #imageInput
                   type="file"
-                  accept="image/jpg, image/jpeg, image/png"
+                  accept=".jpg, .jpeg, .png"
                   (change)="handleImageChange($event)"
                 />
               </i>
@@ -249,11 +265,20 @@
             <div
               class="error"
               *ngIf="
-                signUpForm.get('username')?.invalid &&
+                signUpForm.get('username')?.errors?.required &&
                 signUpForm.get('username')?.touched
               "
             >
               Este campo es requerido.
+            </div>
+            <div
+              class="error"
+              *ngIf="
+                !signUpForm.get('username')?.errors?.required &&
+                signUpForm.get('username')?.errors?.usernameExists
+              "
+            >
+              El username ya existe
             </div>
             <input
               type="text"
@@ -330,37 +355,18 @@
           </div>
           <!-- Country input -->
 
-          <div class="closer_location row gap-05 full-width">
-            <div class="state column gap-05 full-width">
-              <label for="state">Estado</label>
-              <select
-                #stateSelect
-                formControlName="state"
-                id="state"
-                (change)="updateCities($event)"
+          <div class="state column gap-05 full-width">
+            <label for="state">Estado</label>
+            <select #stateSelect formControlName="state" id="state">
+              <option
+                *ngFor="let state of this.location.states"
+                [value]="state.iso2"
               >
-                <option
-                  *ngFor="let state of this.location.states"
-                  [value]="state.iso2"
-                >
-                  {{ state.name }}
-                </option>
-              </select>
-            </div>
-            <!-- State input -->
-            <div class="city column gap-05 full-width">
-              <label for="city">Ciudad</label>
-              <select id="city" formControlName="city">
-                <option
-                  *ngFor="let city of this.location.cities"
-                  [value]="city.name"
-                >
-                  {{ city.name }}
-                </option>
-              </select>
-            </div>
-            <!-- City input -->
+                {{ state.name }}
+              </option>
+            </select>
           </div>
+          <!-- State input -->
 
           <button class="poppins full-width" (click)="nextStep()">
             CREAR CUENTA

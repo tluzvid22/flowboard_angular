@@ -27,7 +27,53 @@
     padding: 0.5rem;
   }
 
-  .add_task:hover {
+  .clicked {
+    padding: 0.5rem;
+
+    button {
+      background-color: #579dff;
+      color: $primary_color;
+      font-family: "Inter", "Roboto", system-ui;
+      border-radius: 5px;
+      padding: 0.8rem;
+      border: none;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    i {
+      font-size: 18px;
+    }
+
+    textarea {
+      padding-bottom: 2rem;
+      padding-top: 0.3rem;
+      padding-left: 0.3rem;
+      background-color: $primary_color;
+      color: $secondary_color;
+      border: none;
+      border-radius: 6px;
+      font-family: "Inter", "Roboto", system-ui;
+      outline: 1px solid $secondary_color;
+      resize: none;
+    }
+
+    textarea::placeholder {
+      color: $secondary_60;
+    }
+
+    textarea:focus {
+      outline: 2px solid $secondary_color;
+    }
+  }
+
+  .add_task:has(.not_clicked:hover) {
+    background-color: $secondary_90;
+  }
+
+  .add_task:hover:has(.not_clicked) {
     box-shadow: inset 0px 0px 0px 2px $primary_color;
     background-color: $primary_20;
   }

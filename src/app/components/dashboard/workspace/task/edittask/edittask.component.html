@@ -1,0 +1,149 @@
+<div class="wrapper full-height full-width full-center">
+  <div class="content column full-center">
+    <div class="edit">
+      <div class="name row gap-1 align-center full-width">
+        <i class="fa-solid fa-signature"></i>
+        <div class="header">
+          <div
+            *ngIf="
+              this.isHeaderClicked ||
+              this.editedTask.name === undefined ||
+              this.editedTask.name.length === 0
+            "
+            class="input"
+          >
+            <input
+              #taskTitle
+              value="{{
+                !(
+                  this.editedTask.name === undefined ||
+                  this.editedTask.name.length === 0
+                )
+                  ? this.editedTask.name
+                  : ''
+              }}"
+              placeholder="{{
+                this.editedTask.name === undefined ||
+                this.editedTask.name.length === 0
+                  ? 'Añade un título'
+                  : ''
+              }}"
+              maxlength="70"
+              (blur)="handleInputChange()"
+              (keydown.enter)="handleInputChange()"
+              (keydown.escape)="handleInputChange()"
+            />
+          </div>
+          <div *ngIf="!this.isHeaderClicked" class="text">
+            <h3 (click)="enterEditNameMode()">
+              {{ task.name }}
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="description column gap-1">
+        <div class="title row gap-1 align-center full-width">
+          <i class="fa-solid fa-align-justify"></i>
+          <h3>Descripción</h3>
+        </div>
+        <div class="description">
+          <div
+            *ngIf="
+              this.isDescriptionClicked ||
+              this.editedTask.description === undefined ||
+              this.editedTask.description.length === 0
+            "
+            class="textarea column gap-1"
+          >
+            <textarea
+              #taskDescription
+              placeholder="{{
+                this.editedTask.description === undefined ||
+                this.editedTask.description.length === 0
+                  ? 'Añade una descripción'
+                  : ''
+              }}"
+              value="{{
+                !(
+                  this.editedTask.description === undefined ||
+                  this.editedTask.description.length === 0
+                )
+                  ? this.editedTask.description
+                  : ''
+              }}"
+              (blur)="handleDescriptionChange()"
+              (keydown.enter)="handleDescriptionChange()"
+              (keydown.escape)="handleDescriptionChange()"
+            ></textarea>
+            <button>Hecho</button>
+          </div>
+          <div
+            *ngIf="
+              !this.isDescriptionClicked &&
+              !(
+                this.editedTask.description === undefined ||
+                this.editedTask.description.length === 0
+              )
+            "
+            class="text column gap-1"
+          >
+            <p (click)="enterEditDescriptionMode()">
+              {{ task.description }}
+            </p>
+            <button (click)="enterEditDescriptionMode()">Editar</button>
+          </div>
+        </div>
+      </div>
+      <div class="due_date column gap-1 justify-center full-width">
+        <div class="header row gap-1 align-center">
+          <i class="fa-solid fa-calendar-days"></i>
+          <h3>Fecha de vencimiento</h3>
+        </div>
+        <input
+          #dateInput
+          type="date"
+          min="{{ this.todayDate }}"
+          (click)="$event.stopPropagation()"
+          value="{{ this.editedTask.due_date ?? '' }}"
+          (change)="this.editedTask.due_date = dateInput.value.toString()"
+        />
+      </div>
+      <div class="users column gap-1 align-center full-width">
+        To implement yet!!
+      </div>
+      <div class="files_section column gap-1 justify-center full-width">
+        <div class="header row gap-1 align-center">
+          <i class="fa-solid fa-paperclip"></i>
+          <h3>Archivos adjuntos</h3>
+        </div>
+        <ul class="files row full-width gap-05 full-center">
+          <li
+            class="file clickable full-center column"
+            *ngFor="let file of this.editedTask.files"
+            (click)="openFile(file)"
+          >
+            <p>{{ file.name?.substring(0, 10) }}</p>
+            <p class="extension">{{ file.fileType?.substring(1) }}</p>
+          </li>
+          <p class="disclaimer">
+            Nota: Los archivos son guardados automáticamente
+          </p>
+        </ul>
+        <input
+          #imageInput
+          type="file"
+          accept="{{ getValidFormats().join(', ') }}"
+          (change)="handleImageChange($event)"
+          (click)="$event.stopPropagation()"
+        />
+        <div class="full-center">
+          <button (click)="imageInput.click()">Adjuntar un archivo</button>
+        </div>
+      </div>
+    </div>
+    <div class="buttons full-width row justify-right gap-1">
+      <button (click)="leaveEditTask(false)">Cancelar</button>
+      <button (click)="leaveEditTask(true)">Hecho</button>
+    </div>
+  </div>
+</div>

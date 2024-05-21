@@ -1,0 +1,113 @@
+@import "src/styles/variables.scss";
+
+.wrapper {
+  background-color: $primary_color;
+  color: $black;
+  overflow-y: auto;
+
+  .blue {
+    background-color: $blue;
+  }
+
+  .purple {
+    background-color: $purple;
+  }
+
+  ul {
+    width: 95%;
+    height: 95%;
+    list-style: none;
+    justify-content: flex-start;
+    align-items: start;
+    align-content: flex-start;
+  }
+
+  .add_workspace,
+  .workspace {
+    font-family: "Inter", "Roboto", system-ui;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 20px;
+    min-width: 30%;
+    flex-grow: 1;
+    height: 8rem;
+    text-wrap: wrap;
+  }
+
+  .workspace {
+    position: relative;
+    i {
+      position: absolute;
+      top: 0;
+      padding: 1rem;
+      right: 0;
+      color: black;
+    }
+  }
+
+  .modal {
+    position: absolute;
+    top: 0;
+    margin: 0.3rem;
+    right: 0;
+    z-index: 4;
+    font-weight: normal;
+    font-size: 14px;
+    background-color: $primary_color;
+    border: 1px solid #ccc;
+    width: 60%;
+    height: 30%;
+    box-shadow: 0 1px 2px 0 $secondary_color;
+    border-radius: 2px;
+  }
+
+  .clicked {
+    padding: 0.5rem;
+
+    button {
+      background-color: #579dff;
+      color: $primary_color;
+      font-family: "Inter", "Roboto", system-ui;
+      border-radius: 5px;
+      padding: 0.4rem;
+      border: none;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    input {
+      padding: 0.5rem;
+      background-color: $primary_90;
+      color: $secondary_80;
+      border: none;
+      border-radius: 6px;
+      font-family: "Inter", "Roboto", system-ui;
+      outline: 1.5px solid $secondary_10;
+    }
+
+    input:focus {
+      outline: 2px solid $secondary_30;
+    }
+  }
+
+  .add_list:has(.not_clicked:hover) {
+    background-color: $secondary_90;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $secondary_20;
+  border-radius: 20px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: $secondary_30;
+}

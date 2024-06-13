@@ -1,11 +1,23 @@
-<div class="wrapper column" (click)="this.isAddTaskClicked = false">
-  <h3 class="title">{{ this.list.name }}</h3>
-  <ul class="justify-center gap-05 column">
-    <li *ngFor="let task of this.list.tasks">
-      <app-task class="task" [task]="task"></app-task>
-    </li>
-    <li
-      class="add_task {{ !this.isAddTaskClicked ? 'clickable' : '' }}"
+<div
+  class="wrapper column"
+  (click)="this.isAddTaskClicked = false"
+  (mouseenter)="this.onFocus = true"
+  (mouseleave)="this.onFocus = false"
+>
+  <div #preview></div>
+  <div class="headlines row space-between full-width align-center">
+    <h3 class="title">{{ this.list.name }}</h3>
+    <i
+      *ngIf="this.onFocus"
+      class="fa-solid fa-trash"
+      (click)="deleteList(); $event.stopPropagation()"
+    ></i>
+  </div>
+  <div class="inner gap-05 column">
+    <div
+      class="add_task {{
+        !this.isAddTaskClicked ? 'clickable' : 'not_clickable'
+      }}"
       (click)="$event.stopPropagation(); this.isAddTaskClicked = true"
     >
       <div *ngIf="this.isAddTaskClicked" class="clicked column gap-05">
@@ -46,6 +58,25 @@
         <i class="fa-solid fa-plus clickable"></i>
         <p>Añade una tarea</p>
       </div>
-    </li>
-  </ul>
+    </div>
+    <!-- addtask -->
+    <div
+      id="LIST{{ list.id }}"
+      class="task_list justify-center gap-05 column"
+      [cdkDropListConnectedTo]="this.connectedLists"
+      (cdkDropListDropped)="drop($event)"
+      [cdkDropListData]="this.list.tasks"
+      cdkDropList
+    >
+      <app-task
+        *ngFor="let task of this.list.tasks"
+        cdkDrag
+        [cdkDragPreviewContainer]="previewContainer"
+        [task]="task"
+        class="task"
+      >
+      </app-task>
+    </div>
+    <!-- each individual task -->
+  </div>
 </div>

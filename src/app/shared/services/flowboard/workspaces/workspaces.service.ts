@@ -3,6 +3,7 @@ import { environment } from 'environments/development';
 import { ApiService } from '../../api/api.service';
 import { Files, List, Task, Workspace } from 'src/app/shared/types/workspaces';
 import { Observable } from 'rxjs';
+import { Collaborator } from 'src/app/shared/types/user';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,8 @@ import { Observable } from 'rxjs';
 export class WorkspacesService {
   private BASE_URL = environment.flowboardAPI.base_url;
   private WORKSPACE_ENDPOINT = environment.flowboardAPI.endpoints.workspace;
+  private COLLABORATOR_ENDPOINT =
+    environment.flowboardAPI.endpoints.collaborator;
   private LIST_ENDPOINT = environment.flowboardAPI.endpoints.list;
   private TASK_ENDPOINT = environment.flowboardAPI.endpoints.task;
   private FILE_ENDPOINT = environment.flowboardAPI.endpoints.file;
@@ -49,6 +52,16 @@ export class WorkspacesService {
     return this.api.post(url, list, this.headers);
   }
 
+  public putList(list: List): Observable<List> {
+    const url = `${this.BASE_URL}${this.LIST_ENDPOINT.list}`;
+    return this.api.put(url, list, this.headers);
+  }
+
+  public deleteListById(listId: number): Observable<boolean> {
+    const url = `${this.BASE_URL}${this.LIST_ENDPOINT.list}/${listId}`;
+    return this.api.delete(url, this.headers);
+  }
+
   public getListsByWorkspaceId(workspace_id: number): Observable<List[]> {
     const url = `${this.BASE_URL}${this.LIST_ENDPOINT.listsByWorkspace}${workspace_id}`;
     return this.api.get(url, this.headers);
@@ -57,6 +70,16 @@ export class WorkspacesService {
   public postTask(task: Task): Observable<Task> {
     const url = `${this.BASE_URL}${this.TASK_ENDPOINT.task}`;
     return this.api.post(url, task, this.headers);
+  }
+
+  public deleteTaskById(taskId: number): Observable<boolean> {
+    const url = `${this.BASE_URL}${this.TASK_ENDPOINT.task}/${taskId}`;
+    return this.api.delete(url, this.headers);
+  }
+
+  public putTask(task: Task): Observable<Task> {
+    const url = `${this.BASE_URL}${this.TASK_ENDPOINT.task}`;
+    return this.api.put(url, task, this.headers);
   }
 
   public getTasksByListId(list_id: number): Observable<Task[]> {
@@ -88,5 +111,67 @@ export class WorkspacesService {
   public getFilesByTaskId(task_id: number): Observable<Files[]> {
     const url = `${this.BASE_URL}${this.FILE_ENDPOINT.filesByTask}${task_id}`;
     return this.api.get(url, this.headers);
+  }
+
+  public getFileByFileId(file_id: number): Observable<Files> {
+    const url = `${this.BASE_URL}${this.FILE_ENDPOINT.file}/${file_id}`;
+    console.log(url);
+    return this.api.get(url, this.headers);
+  }
+
+  public postCollaborator(
+    adminId: number,
+    adminToken: string,
+    collaborator: Collaborator
+  ): Observable<Collaborator> {
+    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}`;
+    return this.api.post(
+      url,
+      { adminId, adminToken, ...collaborator },
+      this.headers
+    );
+  }
+
+  public getCollaboratorsByWorkspaceAndUserId(
+    workspaceId: number,
+    userId: number,
+    token: string
+  ): Observable<Collaborator[]> {
+    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}/${workspaceId}/${userId}/${token}`;
+    return this.api.get(url, this.headers);
+  }
+
+  public deleteCollaboratorByWorkspaceAndUserId(
+    adminId: number,
+    adminToken: string,
+    userId: number,
+    workspaceId: number
+  ): Observable<boolean> {
+    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}`;
+    console.log({
+      adminId: adminId,
+      adminToken: adminToken,
+      userId: userId,
+      workspaceId: workspaceId,
+    });
+    return this.api.delete(url, this.headers, {
+      adminId: adminId,
+      adminToken: adminToken,
+      userId: userId,
+      workspaceId: workspaceId,
+    });
+  }
+
+  public updateCollaborator(
+    adminId: number,
+    adminToken: string,
+    collaborator: Collaborator
+  ): Observable<Collaborator> {
+    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}`;
+    return this.api.put(
+      url,
+      { adminId, adminToken, ...collaborator },
+      this.headers
+    );
   }
 }

@@ -30,8 +30,15 @@ export const environment = {
       user: {
         user: '/User',
         emailExists: '/User/email/',
-        usernameExists: '/User/username/',
+        usernameExists: '/User/username/exists/',
+        usernameSearch: '/User/username/search/',
         token: '/User/token/',
+      },
+      friend: {
+        friend: '/Friend',
+      },
+      request: {
+        request: '/Request',
       },
       token: {
         token: '/Token',
@@ -48,6 +55,9 @@ export const environment = {
       workspace: {
         workspace: '/Workspace',
         workspacesByUser: '/Workspace/user/',
+      },
+      collaborator: {
+        collaborator: '/Collaborator',
       },
     },
   },

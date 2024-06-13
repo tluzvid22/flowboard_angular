@@ -31,11 +31,11 @@ const routes: Routes = [
         (m) => m.DashboardModule
       ),
   },
-  {
-    path: '**',
-    redirectTo: 'home',
-    pathMatch: 'full',
-  },
+  // {
+  //   path: '**',
+  //   redirectTo: 'home',
+  //   pathMatch: 'full',
+  // },
 ];
 
 @NgModule({

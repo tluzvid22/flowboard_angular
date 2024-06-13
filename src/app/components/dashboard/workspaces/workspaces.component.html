@@ -1,25 +1,45 @@
 <div class="wrapper full-height full-width full-center">
   <ul class="row wrap gap-05">
     <li
+      *ngFor="let workspace of workspaces; let i = index"
       class="workspace clickable full-center"
-      *ngFor="let workspace of this.workspaces; let i = index"
-      routerLink="workspace/{{ workspace.id }}"
       [ngClass]="i % 2 === 0 ? 'blue' : 'purple'"
+      (mouseenter)="workspace.showSettings = true"
+      (mouseleave)="workspace.showSettings = false"
     >
-      {{ workspace.name }}
+      <div
+        class="full-width full-height full-center"
+        [routerLink]="['./workspace', workspace.id]"
+        [relativeTo]="this.activatedRoute"
+      >
+        {{ workspace.name }}
+      </div>
+      <div
+        *ngIf="workspace.showSettings"
+        [routerLink]="[workspace.id, 'edit']"
+        [relativeTo]="this.activatedRoute"
+        class="centerWrapper"
+      >
+        <!-- [routerLink]="['./workspace', workspace.id, 'edit']" -->
+        <div class="center">
+          <i class="fa-solid fa-gear settings full-center"></i>
+        </div>
+      </div>
     </li>
     <li
       class="add_workspace full-center {{
         !this.isAddWorkspaceClicked ? 'clickable' : ''
       }}"
-      [ngClass]="this.workspaces!.length % 2 === 0 ? 'blue' : 'purple'"
+      [ngClass]="
+        this.workspaces && this.workspaces.length % 2 === 0 ? 'blue' : 'purple'
+      "
       (click)="this.isAddWorkspaceClicked = true"
     >
       <div *ngIf="this.isAddWorkspaceClicked" class="clicked column gap-05">
         <input
           type="text"
           #workspaceTitle
-          maxlength="25"
+          maxlength="12"
           placeholder="Título del workspace"
           (keydown.enter)="addWorkspace(workspaceTitle.value)"
         />
@@ -48,4 +68,7 @@
       </div>
     </li>
   </ul>
+  <div *ngIf="this.getIsOverlayOn()" class="overlay">
+    <router-outlet></router-outlet>
+  </div>
 </div>

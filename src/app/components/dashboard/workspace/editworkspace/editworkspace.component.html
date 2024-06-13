@@ -1,0 +1,102 @@
+<div class="wrapper full-center">
+  <div #content class="content column gap-1" (click)="unshowNewUser()">
+    <div class="title">
+      <h3 class="title full-center">Colaboradores</h3>
+      <i class="fa-solid fa-xmark" (click)="leave()"></i>
+    </div>
+    <div
+      *ngFor="let collaborator of collaborators"
+      class="collaborator row space-between align-center p-1 full-width gap-1"
+    >
+      <i
+        class="fa-solid fa-xmark clickable"
+        (click)="deleteUser(collaborator)"
+      ></i>
+
+      <div class="user row gap-05 full-width align-center justify-left">
+        <img
+          src="{{ collaborator.user.image?.contentUrl }}"
+          alt="Avatar of {{ collaborator.user.username }}"
+        />
+        <span class="option-text">{{ collaborator.user.username }}</span>
+      </div>
+      <div
+        class="checkboxs full-width column"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="checkbox">
+          <label [htmlFor]="'modify-' + collaborator.userId">Eliminar</label>
+          <input
+            [id]="'modify-' + collaborator.userId"
+            type="checkbox"
+            [(ngModel)]="collaborator.canDelete"
+          />
+        </div>
+        <div class="checkbox">
+          <label>Modificar</label>
+          <input type="checkbox" [(ngModel)]="collaborator.canModify" />
+        </div>
+      </div>
+    </div>
+    <div
+      *ngIf="showNewUser"
+      class="new_user row full-center full-width space-between gap-1"
+    >
+      <div
+        #selectMenu
+        class="select-menu full-width"
+        (click)="handleMenuClick(); $event.stopPropagation()"
+      >
+        <div class="select-btn gap-1" (click)="handleSelectBtnClick()">
+          <span *ngIf="!isInputShowed" class="sBtn-text">{{
+            "Escoge un usuario"
+          }}</span>
+          <input
+            #selectInput
+            *ngIf="isInputShowed"
+            type="text"
+            class="sBtn-text full-width"
+            value="{{ searchSelectTerms.value }}"
+            placeholder="Escoge un usuario"
+            [(ngModel)]="searchSelectTerms.value"
+            (keyup.enter)="
+              addCollaborator(filteredPotentialCollaborators[0]);
+              searchSelectTerms.next('')
+            "
+            (keyup)="searchOnSelect($event); $event.stopPropagation()"
+            (click)="$event.stopPropagation()"
+          />
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <ul class="list_users options column full-center gap-05">
+          <li
+            *ngFor="let potentialCollaborator of filteredPotentialCollaborators"
+            id="{{ potentialCollaborator.user.id }}"
+            class="user option row space-between align-center p-1 full-width"
+            (click)="addCollaborator(potentialCollaborator)"
+          >
+            <img
+              src="{{ potentialCollaborator.user.image?.contentUrl }}"
+              alt="Avatar of {{ potentialCollaborator.user.username }}"
+            />
+            <span class="option-text">{{
+              potentialCollaborator.user.username
+            }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      *ngIf="!showNewUser"
+      class="add_user clickable row full-center gap-1"
+      (click)="showNewUser = true; $event.stopPropagation()"
+    >
+      <h4>Invita a un nuevo colaborador</h4>
+      <i class="fa-solid fa-plus"></i>
+    </div>
+    <div class="buttons row full-width align-center justify-right gap-1">
+      <button (click)="saveChanges()" [disabled]="canSave()">Guardar</button>
+      <button (click)="leave()">Salir</button>
+    </div>
+  </div>
+</div>

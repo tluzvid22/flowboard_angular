@@ -129,7 +129,6 @@ export class EdittaskComponent implements OnInit {
     const endpoints: string[] = actualUrl.split('/');
 
     const workspaceUrl = endpoints.slice(0, 6).join('/');
-    WorkspaceComponent.setIsOverlayOn(false);
     this.router.navigate([workspaceUrl]);
   }
 

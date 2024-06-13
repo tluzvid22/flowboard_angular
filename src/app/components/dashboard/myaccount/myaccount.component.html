@@ -1,0 +1,177 @@
+<form
+  [formGroup]="signUpForm!"
+  class="wrapper column full-center full-width gap-05"
+>
+  <div class="headlines row align-center space-between full-width">
+    <div class="text">
+      <h2>Edita tu perfil</h2>
+    </div>
+    <div class="profile_img">
+      <img
+        #avatar
+        src="/assets/img/defaultpicture.jpg"
+        alt="Default profile picture"
+      />
+      <i (click)="handleImageSubmit()" class="fa-solid fa-pen clickable"
+        ><input
+          #imageInput
+          type="file"
+          accept=".jpg, .jpeg, .png"
+          (change)="handleImageChange($event)"
+        />
+      </i>
+    </div>
+  </div>
+
+  <div class="input-container">
+    <div
+      class="error"
+      *ngIf="
+        signUpForm!.get('username')?.errors?.required &&
+        signUpForm!.get('username')?.touched
+      "
+    >
+      Este campo es requerido.
+    </div>
+    <div
+      class="error"
+      *ngIf="
+        !signUpForm!.get('username')?.errors?.required &&
+        signUpForm!.get('username')?.errors?.usernameExists
+      "
+    >
+      El username ya existe
+    </div>
+    <input
+      type="text"
+      id="username"
+      formControlName="username"
+      placeholder="Nombre de usuario"
+    />
+  </div>
+  <!-- Username input -->
+
+  <div class="input-container">
+    <div
+      class="error"
+      *ngIf="
+        signUpForm?.get('email')?.touched &&
+        !signUpForm?.get('email')?.errors?.required &&
+        signUpForm?.get('email')?.errors?.email
+      "
+    >
+      El correo electrónico debe ser valido
+    </div>
+    <div
+      class="error"
+      *ngIf="
+        signUpForm?.get('email')?.touched &&
+        signUpForm?.get('confirmEmail')?.touched &&
+        !signUpForm?.get('email')?.errors?.email &&
+        (signUpForm?.get('email')?.errors?.required ||
+          signUpForm?.get('confirmEmail')?.errors?.required)
+      "
+    >
+      Campos requeridos
+    </div>
+    <div
+      class="error"
+      *ngIf="
+        (!(
+          signUpForm?.get('email')?.errors?.required ||
+          signUpForm?.get('confirmEmail')?.errors?.required
+        ) &&
+          !signUpForm?.get('email')?.errors?.email &&
+          !signUpForm?.get('email')?.errors?.differentEmails &&
+          signUpForm?.get('email')?.errors?.emailExists) ||
+        signUpForm?.get('confirmEmail')?.errors?.emailExists
+      "
+    >
+      El correo electronico ya existe
+    </div>
+
+    <input
+      type="email"
+      id="email"
+      formControlName="email"
+      placeholder="Correo electrónico"
+    />
+    <!-- Email input -->
+  </div>
+
+  <div class="input-container">
+    <div
+      class="error"
+      *ngIf="
+        signUpForm!.get('address')?.invalid &&
+        signUpForm!.get('address')?.touched
+      "
+    >
+      Este campo es requerido.
+    </div>
+    <input
+      type="text"
+      id="address"
+      formControlName="address"
+      placeholder="Dirección"
+    />
+  </div>
+  <!-- Address input -->
+
+  <div class="input-container">
+    <div
+      class="error"
+      *ngIf="
+        signUpForm!.get('phone')?.errors?.required &&
+        signUpForm!.get('phone')?.touched
+      "
+    >
+      Este campo es requerido.
+    </div>
+    <div
+      class="error"
+      *ngIf="
+        !signUpForm!.get('phone')?.errors?.required &&
+        signUpForm!.get('phone')?.touched &&
+        signUpForm!.get('phone')?.errors?.pattern
+      "
+    >
+      El número de teléfono debe ser válido
+    </div>
+    <input
+      type="text"
+      id="phone"
+      formControlName="phone"
+      placeholder="Número de teléfono"
+    />
+  </div>
+  <!-- Telephone input -->
+
+  <div class="country column gap-05 full-width">
+    <label for="country">País</label>
+    <select
+      #countrySelect
+      id="country"
+      formControlName="country"
+      (change)="updateCountry($event); updateStates()"
+    >
+      <option
+        *ngFor="let country of this.location.countries"
+        [value]="country.iso2"
+      >
+        {{ country.name }}
+      </option>
+    </select>
+  </div>
+  <!-- Country input -->
+
+  <div class="state column gap-05 full-width">
+    <label for="state">Estado</label>
+    <select #stateSelect formControlName="state" id="state">
+      <option *ngFor="let state of this.location.states" [value]="state.iso2">
+        {{ state.name }}
+      </option>
+    </select>
+  </div>
+  <!-- State input -->
+</form>

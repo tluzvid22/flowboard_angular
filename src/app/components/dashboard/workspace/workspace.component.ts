@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Route, Router } from '@angular/router';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { DeleteConfirmationEventsService } from 'src/app/shared/services/delete-confirmation-events/delete-confirmation-events.service';
 import { WorkspacesService } from 'src/app/shared/services/flowboard/workspaces/workspaces.service';
 import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
 import { List, Workspace } from 'src/app/shared/types/workspaces';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-workspace',
@@ -12,85 +14,145 @@ import { List, Workspace } from 'src/app/shared/types/workspaces';
   styleUrl: './workspace.component.scss',
 })
 export class WorkspaceComponent implements OnInit {
-  public lists: List[] | any;
+  public workspace?: Workspace;
   public isAddListClicked: boolean = false;
-  public workspace_id: number = 0;
   public static isOverlayOn: boolean;
-  public isModalOpen: boolean = false;
+  private loginCookies?: string;
+  @ViewChild('preview') previewContainer!: ElementRef;
 
   constructor(
     private workspacesAPI: WorkspacesService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private userData: UserDataService
+    private userData: UserDataService,
+    private askConfirmation: DeleteConfirmationEventsService
   ) {
-    this.activatedRoute.params.subscribe((params) => {
-      this.workspace_id = +params['id'];
-      this.workspacesAPI.getListsByWorkspaceId(this.workspace_id).subscribe(
-        (response: List[]) => {
-          this.lists = response;
-        },
-        (error) => {
-          const routerEndpoints = this.router.url.split('/');
-          console.log(error);
-        }
-      );
-      //init lists
-    });
-    //init workspace id
-
     router.events.subscribe((val) => {
-      if (router.url.includes('edit')) {
+      if (router.url.includes('edit') || router.url.includes('delete')) {
         WorkspaceComponent.setIsOverlayOn(true);
       } else {
         WorkspaceComponent.setIsOverlayOn(false);
       }
     });
+    //overlay
+
+    this.askConfirmation.confirmation$.subscribe(
+      (response: {
+        confirmation: boolean;
+        deleteId?: number;
+        typeof?: string;
+      }) => {
+        if (
+          !response.confirmation ||
+          response.deleteId !== this.workspace?.id ||
+          response.typeof?.toUpperCase() !== 'WORKSPACE'
+        )
+          return;
+        this.deleteWorkspace();
+        this.askConfirmation.setConfirmation({ confirmation: false });
+      }
+    );
+    //workspace delete handle
+    this.activatedRoute.params.subscribe((params) => {
+      const newId = params['id'];
+      if (newId) this.userData.setSelectedWorkspaceByWorkspaces(newId);
+    });
+    //to reload component when route changed to other workspace
   }
 
   async ngOnInit(): Promise<void> {
     await this.userData.whenInitialized();
 
-    const workspaceList: Workspace[] = await firstValueFrom(
-      this.userData.workspaces$
-    );
+    this.loginCookies = await firstValueFrom(this.userData.loginCookies$);
+    const workspace_id = this.activatedRoute.snapshot.params['id'];
 
-    if (
-      workspaceList.findIndex((element) => (element.id = this.workspace_id)) ===
-      -1
-    ) {
+    //console.log(await firstValueFrom(this.userData.workspaces$));
+
+    this.workspace = (
+      await firstValueFrom(this.userData.selectedWorkspace$)
+    )[0];
+    this.userData.selectedWorkspace$.subscribe((response: Workspace[]) => {
+      this.workspace = response[0];
+    });
+    //getworkspace
+    if (!this.workspace) {
       const actualUrl = this.router.url.split('/');
       const workspacesUrl = actualUrl.splice(0, actualUrl.length - 2).join('/');
       this.router.navigate([workspacesUrl]);
       return;
     }
+
+    this.workspace!.lists! =
+      this.workspace!.lists!.sort((a, b) => a.order! - b.order!)! ??
+      this.workspace?.lists!;
+
+    this.userData.loginCookies$.subscribe((cookies) => {
+      this.loginCookies = cookies;
+    });
+    //cookies
   }
 
-  openSettingsWorkspace() {
-    this.isModalOpen = true;
-  }
-  closeSettings() {
-    this.isModalOpen = false;
+  deleteWorkspace() {
+    this.workspacesAPI
+      .deleteWorkspaceById(
+        +this.workspace?.id!,
+        +this.workspace?.userId!,
+        this.loginCookies!
+      )
+      .subscribe(
+        (response: boolean) => {
+          if (!response) return;
+          this.userData.pullWorkspaces();
+          const actualUrl = this.router.url.split('/');
+          const workspacesUrl = actualUrl.indexOf('workspaces');
+          this.router.navigate([
+            actualUrl.splice(0, workspacesUrl + 1).join('/'),
+          ]);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
   }
 
-  deleteWorkspace() {}
+  getConnectedLists(actualListId: number): string[] {
+    return this.workspace!.lists!.map((i: List) =>
+      String('LIST' + i.id)
+    ).filter((j: string) => j !== String('LIST' + actualListId));
+  }
 
   public addList(listTitle: string) {
     this.workspacesAPI
       .postList({
         id: 0,
         name: listTitle,
-        workspaceId: this.workspace_id,
+        workspaceId: this.workspace!.id!,
       })
       .subscribe(
         (response: List) => {
-          this.lists.push(response);
+          this.workspace?.lists!.push(response);
         },
         (error) => {
           this.showError();
           console.log(error);
         }
       );
+  }
+
+  drop(event: CdkDragDrop<List[]>) {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+    const containerData = event.container.data;
+
+    moveItemInArray(containerData!, previousIndex, currentIndex);
+
+    const updatedList = {
+      ...containerData![currentIndex],
+      order: currentIndex,
+    };
+
+    /*const response =*/
+    firstValueFrom(this.workspacesAPI.putList(updatedList));
   }
 
   public getIsOverlayOn() {

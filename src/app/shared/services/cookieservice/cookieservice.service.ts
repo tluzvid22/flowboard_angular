@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from 'environments/development';
 import { ApiService } from '../api/api.service';
-import { Observable, map, of } from 'rxjs';
+import { Observable, firstValueFrom, map, of } from 'rxjs';
 import { Token, User } from '../../types/user';
 import { UsersService } from '../flowboard/users/users.service';
 import { error } from 'console';
@@ -56,14 +56,15 @@ export class CookieServiceService {
         console.log(error);
       });
     if (response) {
-      const value = response.value;
-
       if (this.cookieService.check('authToken')) {
         this.cookieService.deleteAll('authToken');
       }
 
-      this.cookieService.set('authToken', value);
-      return value;
+      this.cookieService.set('authToken', response.value, {
+        expires: 15,
+        path: '/',
+      });
+      return response.value;
     }
     return '-1';
   }
@@ -72,17 +73,17 @@ export class CookieServiceService {
     return this.cookieService.get('authToken');
   }
 
-  compareTokens(): Observable<{ canLogin: boolean; userId: number }> {
+  async compareTokens(): Promise<{ canLogin: boolean; user?: User }> {
     const localToken = this.getLocalToken();
-    if (!localToken) return of({ canLogin: false, userId: -1 });
+    if (!localToken) return { canLogin: false };
 
-    return this.userService.getUserByToken(localToken).pipe(
-      map((users: User[]) => {
-        return users.length === 1
-          ? { canLogin: true, userId: users[0].id as number }
-          : { canLogin: false, userId: -1 };
-      })
+    const response = await firstValueFrom(
+      this.userService.getUserByToken(localToken)
     );
+
+    return response.length === 1
+      ? { canLogin: true, user: response[0] }
+      : { canLogin: false };
   }
 
   clearTokenFromUserId(userId: number): void {

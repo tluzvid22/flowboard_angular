@@ -1,9 +1,16 @@
 <div
-  class="wrapper row align-center space-between"
+  #wrapper_task
+  class="wrapper row align-center space-between {{
+    deletedTask ? 'deleted' : 'not_deleted'
+  }}"
   (mouseenter)="this.onFocus = true"
-  (click)="editTask()"
   (mouseleave)="this.onFocus = false"
+  (click)="editTask()"
 >
   <h4 class="title">{{ this.task.name }}</h4>
-  <i *ngIf="this.onFocus" class="fa-solid fa-trash"></i>
+  <i
+    *ngIf="this.onFocus"
+    class="fa-solid fa-trash"
+    (click)="deleteTask(); $event.stopPropagation()"
+  ></i>
 </div>

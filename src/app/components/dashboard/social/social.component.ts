@@ -1,21 +1,16 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
-import { CountriesAPIService } from 'src/app/shared/services/countries/countries.service';
-import { UsersService } from 'src/app/shared/services/flowboard/users/users.service';
-import Security from 'src/app/shared/services/security/security.service';
-import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
-import { Country, State } from 'src/app/shared/types/countries';
-import { User } from 'src/app/shared/types/user';
-import { Files } from 'src/app/shared/types/workspaces';
-import { EmailAsyncValidator } from 'src/app/validators/emailValidator';
-import { PasswordValidator } from 'src/app/validators/passwordValidator';
-import { UsernameAsyncValidator } from 'src/app/validators/usernameValidator';
+import { Component, OnInit } from '@angular/core';
+import { error } from 'console';
 import {
-  passwordLength,
-  phoneValidPattern,
-  maxImageSize,
-} from 'src/constants/input';
+  BehaviorSubject,
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  firstValueFrom,
+  switchMap,
+} from 'rxjs';
+import { UsersService } from 'src/app/shared/services/flowboard/users/users.service';
+import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
+import { Friend, Request, Status, User } from 'src/app/shared/types/user';
 
 @Component({
   selector: 'app-social',
@@ -23,102 +18,128 @@ import {
   styleUrl: './social.component.scss',
 })
 export class SocialComponent implements OnInit {
-  @ViewChild('imageInput') imageInput: any;
-  @ViewChild('avatar') avatar: any;
-
-  public signUpForm?: FormGroup;
-  private data?: User;
-  public image?: Files;
-  public location: { countries: Country[]; states: State[] } = {
-    countries: [],
-    states: [],
-  };
-  public countrySelected: string = 'AF';
-  public stateSelected: string = 'BDS';
+  private searchTerms = new BehaviorSubject<string>('');
+  public requestsUsers: Request[] = [];
+  public friendsUsers: Friend[] = [];
+  public shownUsers: User[] = [];
+  public user?: User;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private countriesService: CountriesAPIService,
-    private userData: UserDataService,
-    private usersService: UsersService
+    private userAPI: UsersService,
+    private userData: UserDataService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.data = await firstValueFrom(this.userData.user$);
+    this.user = await firstValueFrom(this.userData.user$);
 
-    this.signUpForm = this.formBuilder.group({
-      password: ['', [Validators.required, PasswordValidator(passwordLength)]],
-      confirmPassword: [
-        '',
-        [Validators.required, PasswordValidator(passwordLength)],
-      ],
-      email: [
-        this.data.email,
-        [Validators.required, Validators.email],
-        [EmailAsyncValidator(this.usersService)],
-      ],
-      confirmEmail: [
-        this.data.confirmEmail,
-        [Validators.required, Validators.email],
-        [EmailAsyncValidator(this.usersService)],
-      ],
-      username: [
-        this.data.username,
-        [Validators.required],
-        [UsernameAsyncValidator(this.usersService)],
-      ],
-      address: [this.data.address, [Validators.required]],
-      phone: [
-        this.data.phone,
-        [Validators.required, Validators.pattern(phoneValidPattern)], //returns 'pattern' property validation error
-      ],
-      country: ['', Validators.required],
-      state: ['', Validators.required],
-      city: ['', Validators.required],
+    this.searchTerms
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((term) => this.userAPI.getUsersByUsername(term))
+      )
+      .subscribe((searchResults: User[]) => {
+        const filteredResults = searchResults.filter(
+          (u) => u.id !== this.user!.id!
+        );
+        const friends = this.friendsUsers.map((f) => f.user);
+        const requests = this.requestsUsers.map((r) => r.user);
+
+        const unmatchingUsers: User[] = [];
+        filteredResults.forEach((result) => {
+          const matchingFriendIndex = friends.find((f) => f.id === result.id);
+          const matchingRequestUserIndex = requests.find(
+            (f) => f.id === result.id
+          );
+          if (!matchingRequestUserIndex && !matchingFriendIndex)
+            unmatchingUsers.push(result);
+        });
+
+        this.shownUsers = friends;
+        this.shownUsers.push(...requests);
+        this.shownUsers.push(...unmatchingUsers);
+      });
+
+    this.searchUsers('');
+    this.friendsUsers = await firstValueFrom(
+      this.userAPI.getFriends(this.user.id!)
+    );
+    this.friendsUsers.forEach((f) => (f.user.isFriend = true));
+    this.requestsUsers = await firstValueFrom(
+      this.userAPI.getRequests(this.user.id!)
+    );
+    this.requestsUsers.forEach((r) => {
+      const user = r.user;
+      user.requestedBeFriend = r.requestedByUserId === this.user?.id;
+      user.wantsToBeFriend = !user.requestedBeFriend;
     });
   }
 
-  handleImageSubmit() {
-    this.imageInput.nativeElement.click();
-  }
-
-  handleImageChange(event: any) {
-    const inputElement = event.target as HTMLInputElement;
-    const file = inputElement.files![0];
-    const fileSize = file.size / 1024 / 1024;
-
-    if (!file || fileSize > maxImageSize) {
-      this.showError();
-      return;
-    }
-    //restrict not valid images
-
-    this.image = file;
-    //save image in user saved data
-
-    this.avatar.nativeElement.src = URL.createObjectURL(file);
-    //read and show image to UI
-  }
-
-  updateCountry(event: any): string {
-    const selectElement = event.target as HTMLSelectElement;
-    this.countrySelected = selectElement.value;
-    return this.countrySelected;
-  }
-
-  updateStates() {
-    this.countriesService.getStates(this.countrySelected).subscribe(
-      (states: State[]) => {
-        this.location.states = states.sort((a, b) =>
-          a.name.localeCompare(b.name)
+  deleteFriend(user: User) {
+    this.userAPI
+      .deleteFriend(user.id!, this.user?.id!)
+      .subscribe((response: boolean) => {
+        if (!response) return;
+        this.friendsUsers = this.friendsUsers.filter(
+          (f) => f.userId !== user.id
         );
-      },
-      (error) => {
-        console.error('Error fetching states: ', error);
-      }
-    );
+        user.isFriend = false;
+      });
   }
-  //countriesAPI
 
-  showError() {}
+  deleteFriendRequest(user: User) {
+    this.userAPI
+      .deleteRequest(user.id!, this.user?.id!)
+      .subscribe((response: boolean) => {
+        if (!response) return;
+        this.requestsUsers = this.requestsUsers.filter(
+          (r) => r.userId !== user.id
+        );
+        user.requestedBeFriend = false;
+      });
+  }
+
+  sendFriendRequest(user: User) {
+    this.userAPI
+      .createRequests(this.user?.id!, user.id!)
+      .subscribe((response: Request) => {
+        if (!response) return;
+        this.requestsUsers.push(response);
+        user.requestedBeFriend = true;
+      });
+  }
+
+  acceptFriendRequest(user: User) {
+    this.userAPI
+      .putRequests(this.user?.id!, user.id!, Status.Accepted)
+      .subscribe((response: Request) => {
+        if (!response) return;
+        this.requestsUsers = this.requestsUsers.filter(
+          (r) => r.userId !== user.id
+        );
+        this.friendsUsers.push({
+          userId: user.id!,
+          user: this.user!,
+        });
+        user.isFriend = true;
+        user.wantsToBeFriend = false;
+      });
+  }
+
+  declineFriendRequest(user: User) {
+    this.userAPI
+      .putRequests(this.user?.id!, user.id!, Status.Declined)
+      .subscribe((response: Request) => {
+        if (!response) return;
+        this.requestsUsers = this.requestsUsers.filter(
+          (r) => r.userId !== user.id
+        );
+        user.wantsToBeFriend = false;
+      });
+  }
+
+  searchUsers(value: string) {
+    if (value === '') value = 'empty';
+    this.searchTerms.next(value);
+  }
 }

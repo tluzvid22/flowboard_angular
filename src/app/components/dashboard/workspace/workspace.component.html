@@ -1,9 +1,22 @@
 <div class="wrapper full-center" (click)="this.isAddListClicked = false">
-  <ul class="content row">
-    <li class="list" *ngFor="let list of this.lists">
-      <app-list [list]="list"></app-list>
-    </li>
-    <li
+  <div #preview></div>
+
+  <div
+    class="content row"
+    cdkDropList
+    cdkDropListOrientation="horizontal"
+    (cdkDropListDropped)="drop($event)"
+    [cdkDropListData]="this.workspace?.lists!"
+  >
+    <app-list
+      class="list"
+      *ngFor="let list of this.workspace?.lists"
+      cdkDrag
+      [list]="list"
+      [cdkDragPreviewContainer]="previewContainer"
+      [connectedLists]="getConnectedLists(list.id!)"
+    ></app-list>
+    <div
       class="add_list full-center {{
         !this.isAddListClicked ? 'clickable' : ''
       }}"
@@ -43,8 +56,8 @@
         <i class="fa-solid fa-plus"></i>
         <p>Añade una lista</p>
       </div>
-    </li>
-  </ul>
+    </div>
+  </div>
   <div *ngIf="this.getIsOverlayOn()" class="overlay">
     <router-outlet></router-outlet>
   </div>

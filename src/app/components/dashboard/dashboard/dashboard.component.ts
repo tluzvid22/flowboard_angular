@@ -1,11 +1,12 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { NavigationEnd, NavigationStart, Router } from '@angular/router';
-import { filter, firstValueFrom, lastValueFrom, map } from 'rxjs';
-import { CookieServiceService } from 'src/app/shared/services/cookieservice/cookieservice.service';
-import { WorkspacesService } from 'src/app/shared/services/flowboard/workspaces/workspaces.service';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter, firstValueFrom } from 'rxjs';
+import { DeleteConfirmationEventsService } from 'src/app/shared/services/delete-confirmation-events/delete-confirmation-events.service';
 import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
 import { User } from 'src/app/shared/types/user';
 import { Workspace } from 'src/app/shared/types/workspaces';
+
+const FAVORITES_MAX_NUMBER = 3;
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +18,7 @@ export class DashboardComponent implements AfterViewInit {
   @ViewChild('username') username?: any;
   @ViewChild('title') title?: any;
   @ViewChild('navbar') navbar?: any;
+  @ViewChild('social') social?: any;
   public isDarkModeOn: boolean = false;
   public isSidebarLeftVisible: boolean = true;
   public isSidebarRightVisible: boolean = true;
@@ -25,12 +27,19 @@ export class DashboardComponent implements AfterViewInit {
   public isWorkspaceAbleToDelete: boolean = true;
   public initialized: Promise<void>;
   public isLogOutTabVisible: boolean = false;
+  public favorites: { linkedTo: string; redirectTo: string }[] = [];
+  public isElementSelectedInFavorites: boolean = false;
+  public isSocialClicked: boolean = false;
+  public selectedElement: { linkedTo: string; redirectTo: string } = {
+    linkedTo: 'OVERVIEW',
+    redirectTo: './overview',
+  };
+  private loginCookies?: string;
 
   constructor(
-    private router: Router,
+    public router: Router,
     private userData: UserDataService,
-    private workspaceService: WorkspacesService,
-    private cookies: CookieServiceService
+    private askConfirmation: DeleteConfirmationEventsService
   ) {
     if (localStorage.getItem('dark_mode') === 'enabled')
       this.isDarkModeOn = true;
@@ -41,15 +50,99 @@ export class DashboardComponent implements AfterViewInit {
     if (localStorage.getItem('isSidebarRightVisible') === 'disabled')
       this.isSidebarRightVisible = false;
 
+    this.askConfirmation.sendAskConfirmation$.subscribe((response) => {
+      if (response.typeof.toUpperCase() === 'WORKSPACE')
+        this.router.navigate([`${this.router.url}/delete`]);
+    });
+    //open workspace delete confirmation
+
+    this.askConfirmation.confirmation$.subscribe(
+      (response: { confirmation: boolean; name?: string; typeof?: string }) => {
+        if (
+          !response.confirmation ||
+          response.typeof?.toUpperCase() !== 'WORKSPACE'
+        )
+          return;
+        const favorite = this.favorites.find(
+          (favorite) =>
+            favorite.linkedTo.toLowerCase() === response.name?.toLowerCase()
+        );
+        if (favorite) this.removeFromFavorites(favorite);
+      }
+    );
     this.initialized = this.init();
+  }
+
+  showSocialBubble(event: Event) {
+    this.isSocialClicked = !this.isSocialClicked;
+    const element = event.currentTarget as HTMLElement;
+    const bounding = element.getBoundingClientRect();
+    const position = { x: bounding.x, y: bounding.y };
+    console.log(position);
+    //relative to position
+    const socialComponent = this.social as HTMLElement;
+    socialComponent.style.left = `${position.x}`;
+    socialComponent.style.top = `${position.y}`;
+  }
+
+  addToFavorites(favorite: { linkedTo: string; redirectTo: string }) {
+    if (this.favorites.length >= FAVORITES_MAX_NUMBER) return;
+    if (
+      this.favorites.findIndex(
+        (element) => element.redirectTo === favorite.redirectTo
+      ) !== -1
+    )
+      return;
+    this.favorites.push(favorite);
+    localStorage.setItem('favorites', JSON.stringify(this.favorites));
+    this.isElementSelectedInFavorites = true;
+    return true;
+  }
+
+  removeFromFavorites(favorite: { linkedTo: string; redirectTo: string }) {
+    if (!favorite) return;
+    const elementIndex = this.favorites.findIndex(
+      (element) => element.redirectTo === favorite.redirectTo
+    );
+    if (elementIndex === -1) return;
+    this.favorites = this.favorites.filter(
+      (item) => item.linkedTo !== favorite.linkedTo
+    );
+    localStorage.setItem('favorites', JSON.stringify(this.favorites));
+    return true;
+  }
+
+  handleFavClick() {
+    if (this.isElementSelectedInFavorites) {
+      this.isElementSelectedInFavorites = !(
+        this.removeFromFavorites(this.selectedElement) ?? true
+      );
+    } else {
+      this.isElementSelectedInFavorites =
+        this.addToFavorites(this.selectedElement) ?? false;
+    }
+  }
+
+  askDeleteConfirmation() {
+    const actualUrl = this.selectedElement.redirectTo.split('/');
+    const deleteId = +actualUrl[actualUrl.indexOf('workspace') + 1];
+    this.askConfirmation.setSendAskConfirmation({
+      typeof: 'workspace',
+      name: this.selectedElement.linkedTo,
+      deleteId: deleteId,
+    });
   }
 
   async init(): Promise<void> {
     await this.userData.whenInitialized();
 
+    this.loginCookies = await firstValueFrom(this.userData.loginCookies$);
     this.user = await firstValueFrom(this.userData.user$);
     this.workspaces = await firstValueFrom(this.userData.workspaces$);
 
+    this.userData.loginCookies$.subscribe((cookies) => {
+      this.loginCookies = cookies;
+    });
     this.userData.user$.subscribe((user) => {
       this.user = user;
     });
@@ -58,7 +151,7 @@ export class DashboardComponent implements AfterViewInit {
     });
   }
 
-  handleNavSelect(event: any) {
+  private cleanSelected() {
     const elements = (
       this.navbar?.nativeElement as HTMLElement
     ).getElementsByClassName('navElement');
@@ -66,50 +159,93 @@ export class DashboardComponent implements AfterViewInit {
     for (var i = 0; i < elements.length; i++) {
       elements[i].classList.remove('nav_selected');
     }
-
-    event.currentTarget.classList.add('nav_selected');
   }
 
   async ngAfterViewInit(): Promise<void> {
     await this.initialized;
-    (this.username.nativeElement as HTMLLabelElement).textContent =
-      this.user!.username;
 
-    this.changeTitleByActualRoute(this.router.url);
+    if (this.user?.username)
+      (this.username.nativeElement as HTMLLabelElement).textContent =
+        this.user.username;
+
+    if (this.user?.image)
+      (this.profilePicture.nativeElement as HTMLImageElement).src =
+        this.user.image.contentUrl;
+
+    const favorites = localStorage.getItem('favorites');
+    if (favorites)
+      (JSON.parse(favorites) as []).forEach((favorite) =>
+        this.addToFavorites(favorite)
+      );
+
+    this.handleRouteChange(this.router.url);
 
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        this.changeTitleByActualRoute(event.url);
+        this.handleRouteChange(event.url);
       });
   }
 
   public logout() {
-    this.cookies.clearTokenFromTokenValue();
+    this.userData.clearCookies();
     this.router.navigate(['home']);
   }
 
-  private changeTitleByActualRoute(routestr: string) {
+  private handleRouteChange(routestr: string) {
     const route = routestr.split('/');
     const workspaceIdIndex: number = route.indexOf('workspace');
-    const workspaceId = +route[workspaceIdIndex + 1];
     const title = this.title.nativeElement as HTMLLabelElement;
 
-    if (route.indexOf('workspace') !== -1) {
+    this.cleanSelected();
+    //clean selected item from navbar
+    let selectedItem = '';
+
+    if (workspaceIdIndex !== -1) {
+      const workspaceId = +route[workspaceIdIndex + 1];
+      const workspaceName = this.workspaces.find(
+        (workspace) => workspace.id == workspaceId
+      )!.name;
+      //search for name and id
+
+      selectedItem = workspaceName;
+
       this.isWorkspaceAbleToDelete = true;
-      title.textContent =
-        this.workspaces.find((workspace) => workspace.id === workspaceId)
-          ?.name ?? 'Workspace';
+      //gives delete possibility
+
+      title.textContent = workspaceName ?? 'Workspace';
+      //change title if exists or default
     } else if (route.indexOf('workspaces') !== -1) {
       this.isWorkspaceAbleToDelete = false;
       title.textContent = 'Workspaces';
+      selectedItem = 'Workspaces';
     } else if (route.indexOf('overview') !== -1) {
       this.isWorkspaceAbleToDelete = false;
       title.textContent = 'Overview';
+      selectedItem = 'Overview';
     } else if (route.indexOf('social') !== -1) {
       this.isWorkspaceAbleToDelete = false;
       title.textContent = 'Social';
+      selectedItem = 'Social';
+    } else if (route.indexOf('myaccount') !== -1) {
+      this.isWorkspaceAbleToDelete = false;
+      title.textContent = 'Mi cuenta';
+      selectedItem = 'Mi cuenta';
     }
+
+    Array.from(
+      document.getElementsByClassName(
+        selectedItem.replace(' ', '').toLowerCase()
+      )
+    ).forEach((element) => {
+      element.classList.add('nav_selected');
+    });
+
+    this.selectedElement = { linkedTo: selectedItem, redirectTo: routestr };
+    this.isElementSelectedInFavorites =
+      this.favorites.findIndex(
+        (favorite) => favorite.linkedTo === this.selectedElement.linkedTo
+      ) !== -1;
   }
 
   redirectToWorkspace(id: number) {
@@ -123,27 +259,10 @@ export class DashboardComponent implements AfterViewInit {
     this.router.navigate([`${dashboardUrl}/workspaces/workspace/${id}`]);
   }
 
-  deleteWorkspace() {
-    const route = this.router.url.split('/');
-    const workspaceIdIndex: number = route.indexOf('workspace');
-    const workspaceId = +route[workspaceIdIndex + 1];
-
-    this.workspaceService
-      .deleteWorkspaceById(
-        workspaceId,
-        this.user?.id as number,
-        this.cookies.getLocalToken()
-      )
-      .subscribe(
-        (response: boolean) => {
-          if (!response) return;
-          this.userData.pullWorkspaces();
-          this.router.navigate([
-            `${route.slice(0, workspaceIdIndex).join('/')}`,
-          ]);
-        },
-        (error) => {}
-      );
+  redirectSocial() {
+    this.router.navigateByUrl('dashboard/4/social', {
+      skipLocationChange: true,
+    });
   }
 
   changeLightMode() {

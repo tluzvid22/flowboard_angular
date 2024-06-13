@@ -1,18 +1,9 @@
-import { List, Workspace } from '../../types/workspaces';
+import { Workspace } from '../../types/workspaces';
 import { User } from '../../types/user';
 import { WorkspacesService } from '../flowboard/workspaces/workspaces.service';
-import { Injectable, OnInit } from '@angular/core';
-import { UsersService } from '../flowboard/users/users.service';
+import { Injectable } from '@angular/core';
 import { CookieServiceService } from '../cookieservice/cookieservice.service';
-import {
-  BehaviorSubject,
-  Observable,
-  firstValueFrom,
-  lastValueFrom,
-  map,
-  mergeMap,
-  of,
-} from 'rxjs';
+import { BehaviorSubject, Observable, lastValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -23,37 +14,32 @@ export class UserDataService {
   >([]);
   public workspaces$: Observable<Workspace[]> = this.workspaces.asObservable();
 
-  private user: BehaviorSubject<User | any> = new BehaviorSubject<User | any>(
-    ''
-  );
+  private user: BehaviorSubject<User> = new BehaviorSubject<User | any>('');
   public user$: Observable<User> = this.user!.asObservable();
-
-  private list: BehaviorSubject<List | any> = new BehaviorSubject<List | any>(
+  private loginCookies: BehaviorSubject<string> = new BehaviorSubject<string>(
     ''
   );
-  public list$: Observable<List> = this.user!.asObservable();
+  public loginCookies$: Observable<string> = this.loginCookies!.asObservable();
   public initialized: Promise<void>;
+
+  private selectedWorkspace: BehaviorSubject<Workspace[]> = new BehaviorSubject<
+    Workspace[]
+  >([]);
+  public selectedWorkspace$: Observable<Workspace[]> =
+    this.selectedWorkspace!.asObservable();
 
   constructor(
     private workspacesAPI: WorkspacesService,
-    private userService: UsersService,
     private cookies: CookieServiceService
   ) {
     this.initialized = this.init();
   }
 
   async init(): Promise<void> {
-    this.user.next(
-      (
-        await lastValueFrom(
-          this.userService.getUserByToken(this.cookies.getLocalToken())
-        )
-      )[0]
-    );
-
-    if (!this.user.getValue()) return;
-
-    await this.pullWorkspaces();
+    this.loginCookies.next(this.cookies.getLocalToken());
+    this.user$.subscribe((updatedUser: User) => {
+      if (updatedUser) this.setWorkspaces(updatedUser.workspaces!);
+    });
   }
 
   async pullWorkspaces() {
@@ -64,7 +50,7 @@ export class UserDataService {
       )
     ).then(
       (response: Workspace[]) => {
-        this.workspaces.next(
+        this.setWorkspaces(
           response.sort(
             (a, b) =>
               new Date(b.updatedAt!).getTime() -
@@ -79,8 +65,24 @@ export class UserDataService {
     //init workspaces
   }
 
+  public clearCookies() {
+    this.cookies.clearTokenFromTokenValue();
+  }
+
   public async whenInitialized(): Promise<void> {
     return this.initialized;
+  }
+
+  setSelectedWorkspaceByWorkspaces(id: number) {
+    const workspace: Workspace = this.workspaces
+      .getValue()
+      .find((workspace) => +workspace.id! === +id)!;
+    if (!workspace) return;
+    this.selectedWorkspace.next([workspace]);
+  }
+
+  setSelectedWorkspace(workspace: Workspace) {
+    this.selectedWorkspace.next([workspace]);
   }
 
   setUser(user: User) {

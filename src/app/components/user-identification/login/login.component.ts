@@ -12,7 +12,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { catchError, map, mergeMap, of } from 'rxjs';
+import { mergeMap } from 'rxjs';
 import { CookieServiceService } from 'src/app/shared/services/cookieservice/cookieservice.service';
 import { UsersService } from 'src/app/shared/services/flowboard/users/users.service';
 import { User } from 'src/app/shared/types/user';

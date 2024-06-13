@@ -57,7 +57,7 @@ export class SignupComponent {
     password: '',
     email: '',
     confirmEmail: '',
-    imageid: '',
+    imageid: 0,
     username: '',
     address: '',
     phone: '',

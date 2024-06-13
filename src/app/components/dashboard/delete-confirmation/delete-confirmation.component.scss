@@ -1,0 +1,33 @@
+@import "src/styles/variables.scss";
+
+.wrapper {
+  .content {
+    background-color: $secondary_color;
+    color: $primary_color;
+    width: 40%;
+    height: 20%;
+    border-radius: 20px;
+    font-family: "Inter", "Roboto", system-ui;
+    font-size: 16px;
+
+    .buttons {
+      border: none;
+      padding: 1rem;
+    }
+
+    h3 {
+      text-align:center;
+    }
+
+    button {
+      width: 45%;
+      height: 2rem;
+      font-weight: bold;
+      background-color: #2563EB;
+      color: $primary_color;
+      font-family: "Inter", "Roboto", system-ui;
+      border: none;
+      border-radius: 3px;
+    }
+  }
+}

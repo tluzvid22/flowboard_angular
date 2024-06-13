@@ -1,0 +1,16 @@
+<div
+  class="wrapper full-height full-width full-center"
+  (click)="leaveConfirmation()"
+>
+  <div class="content column full-center" (click)="$event.stopPropagation()">
+    <h3 class="full-width full-center">
+      Estas seguro que deseas eliminar el/la {{ this.componentToDelete }} "{{
+        this.componentToDeleteName
+      }}"
+    </h3>
+    <div class="buttons row space-around full-width">
+      <button (click)="leaveConfirmation()">No</button>
+      <button (click)="deleteComponent()">Si</button>
+    </div>
+  </div>
+</div>

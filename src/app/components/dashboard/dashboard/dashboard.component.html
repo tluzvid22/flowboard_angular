@@ -1,9 +1,13 @@
 <div
   class="wrapper row full-center sizes"
   [ngClass]="this.isDarkModeOn ? 'dark_mode' : 'light_mode'"
-  (click)="isLogOutTabVisible = false"
+  (click)="isLogOutTabVisible = false; isSocialClicked = false"
 >
-  <div *ngIf="this.isSidebarLeftVisible" class="sidebar left">
+  <div
+    class="sidebar relative {{
+      !this.isSidebarLeftVisible ? 'hidden' : ''
+    }} left"
+  >
     <div class="content space-between column">
       <div #navbar class="top column navbar">
         <div
@@ -36,20 +40,30 @@
         </ul>
         <div class="nav column gap-1">
           <div class="favorites">
-            <label class="title">Favoritos</label>
+            <label class="title">Favoritos (Máx. 3)</label>
             <ul>
               <li
-                (click)="handleNavSelect($event)"
-                class="navElement row align-center gap-05"
+                *ngFor="let favorite of this.favorites"
+                [routerLink]="favorite.redirectTo"
+                class="navElement {{
+                  favorite.linkedTo.toLowerCase().replace(' ', '')
+                }} row align-center gap-05 clickable 
+                {{
+                  this.selectedElement.linkedTo === favorite.linkedTo
+                    ? 'nav_selected'
+                    : ''
+                }}"
               >
+                <label class="clickable">
+                  {{ favorite.linkedTo }}
+                </label>
+              </li>
+              <!-- <li class="navElement row align-center gap-05">
                 <label>Overview</label>
               </li>
-              <li
-                (click)="handleNavSelect($event)"
-                class="navElement row align-center gap-05"
-              >
+              <li class="navElement row align-center gap-05">
                 <label>Espacios de trabajo</label>
-              </li>
+              </li> -->
             </ul>
           </div>
 
@@ -57,8 +71,7 @@
             <label class="title">General</label>
             <ul>
               <li
-                (click)="handleNavSelect($event)"
-                class="navElement row align-center gap-05"
+                class="navElement overview row align-center gap-05"
                 routerLink="overview"
               >
                 <div class="logo">
@@ -75,8 +88,7 @@
                 <label class="clickable">Overview</label>
               </li>
               <li
-                (click)="handleNavSelect($event)"
-                class="navElement row align-center gap-05"
+                class="navElement workspaces row align-center gap-05"
                 routerLink="workspaces"
               >
                 <div class="logo">
@@ -95,16 +107,15 @@
             </ul>
           </div>
 
-          <div class="workspaces">
+          <div class="workspaces_list">
             <label class="title">Espacios de trabajo</label>
             <ul>
               <li
-                (click)="handleNavSelect($event)"
-                class="navElement clickable"
                 *ngFor="let workspace of workspaces.slice(0, 3)"
+                class="navElement {{ workspace.name }} clickable"
                 (click)="redirectToWorkspace(workspace.id!)"
               >
-                <label>{{ workspace.name }}</label>
+                <label class="clickable">{{ workspace.name }}</label>
               </li>
             </ul>
           </div>
@@ -113,8 +124,8 @@
             <label class="title">Sobre mí</label>
             <ul>
               <li
-                (click)="handleNavSelect($event)"
-                class="navElement row align-center gap-05"
+                [routerLink]="['myaccount']"
+                class="navElement micuenta row align-center gap-05"
               >
                 <div class="logo">
                   <img
@@ -127,12 +138,13 @@
                     alt="My account Logo"
                   />
                 </div>
-                <label>Mi cuenta</label>
+                <label class="clickable">Mi cuenta</label>
               </li>
               <li
-                (click)="handleNavSelect($event)"
-                [routerLink]="['social']"
-                class="navElement row align-center gap-05"
+                class="navElement social row align-center gap-05"
+                (click)="
+                  isSocialClicked = !isSocialClicked; $event.stopPropagation()
+                "
               >
                 <div class="logo">
                   <img
@@ -145,7 +157,7 @@
                     alt="Social Logo"
                   />
                 </div>
-                <label>Social</label>
+                <label class="clickable">Social</label>
               </li>
             </ul>
           </div>
@@ -178,9 +190,14 @@
           class="icon"
           [src]="
             this.isDarkModeOn
-              ? '/assets/icons/dashboard/dark/star.svg'
+              ? this.isElementSelectedInFavorites
+                ? '/assets/icons/dashboard/dark/star_selected.svg'
+                : '/assets/icons/dashboard/dark/star.svg'
+              : this.isElementSelectedInFavorites
+              ? '/assets/icons/dashboard/light/star_selected.svg'
               : '/assets/icons/dashboard/light/star.svg'
           "
+          (click)="handleFavClick()"
           alt="Favorite icon"
         />
 
@@ -215,7 +232,7 @@
               : '/assets/icons/dashboard/light/trash.svg'
           "
           alt="Trash icon"
-          (click)="deleteWorkspace()"
+          (click)="askDeleteConfirmation()"
         />
         <img
           class="icon inverted"
@@ -233,7 +250,8 @@
       <router-outlet></router-outlet>
     </div>
   </div>
-  <div *ngIf="this.isSidebarRightVisible" class="sidebar right">
+  <app-social class="overlay" *ngIf="isSocialClicked"></app-social>
+  <div class="sidebar {{ !this.isSidebarRightVisible ? 'hidden' : '' }} right">
     <div class="content justify-center full-height">
       <div class="nav column space-between align-left">
         <div class="notifications">

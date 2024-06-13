@@ -2,9 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { WorkspacesService } from 'src/app/shared/services/flowboard/workspaces/workspaces.service';
 import { Workspace } from 'src/app/shared/types/workspaces';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DashboardComponent } from '../dashboard/dashboard.component';
 import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
 import { User } from 'src/app/shared/types/user';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-workspaces',
@@ -12,23 +12,38 @@ import { User } from 'src/app/shared/types/user';
   styleUrl: './workspaces.component.scss',
 })
 export class WorkspacesComponent implements OnInit {
-  @ViewChild('modal') modalSettings: any;
   public user?: User;
   public workspaces?: Workspace[];
   public isAddWorkspaceClicked: boolean = false;
+  public static isOverlayOn: boolean = false;
   public isModalOpen: boolean = false;
 
   constructor(
     private workspacesAPI: WorkspacesService,
     private router: Router,
-    private userService: UserDataService
-  ) {}
+    private userData: UserDataService,
+    public activatedRoute: ActivatedRoute
+  ) {
+    router.events.subscribe((val) => {
+      if (router.url.includes('edit') || router.url.includes('delete')) {
+        WorkspacesComponent.setIsOverlayOn(true);
+      } else {
+        WorkspacesComponent.setIsOverlayOn(false);
+      }
+    });
+    //overlay
+  }
 
-  ngOnInit(): void {
-    this.userService.user$.subscribe((user) => {
+  async ngOnInit(): Promise<void> {
+    await this.userData.whenInitialized();
+
+    this.user = await firstValueFrom(this.userData.user$);
+    this.workspaces = await firstValueFrom(this.userData.workspaces$);
+
+    this.userData.user$.subscribe((user) => {
       this.user = user;
     });
-    this.userService.workspaces$.subscribe((workspaces) => {
+    this.userData.workspaces$.subscribe((workspaces: Workspace[]) => {
       this.workspaces = workspaces;
     });
   }
@@ -44,7 +59,7 @@ export class WorkspacesComponent implements OnInit {
       .subscribe(
         (response: Workspace) => {
           this.workspaces?.push(response);
-          this.userService.setWorkspaces(this.workspaces as Workspace[]);
+          this.userData.setWorkspaces(this.workspaces as Workspace[]);
           this.router.navigate([`${this.router.url}/workspace/${response.id}`]);
         },
         (error) => {
@@ -52,6 +67,14 @@ export class WorkspacesComponent implements OnInit {
           console.log(error);
         }
       );
+  }
+
+  public getIsOverlayOn() {
+    return WorkspacesComponent.isOverlayOn;
+  }
+
+  public static setIsOverlayOn(isOverlayOn: boolean) {
+    WorkspacesComponent.isOverlayOn = isOverlayOn;
   }
 
   public showError() {

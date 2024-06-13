@@ -3,6 +3,7 @@ import { User } from './user';
 export interface List {
   id?: number;
   name: string;
+  order?: number;
   tasks?: Task[];
   workspaceId: number;
 }
@@ -10,6 +11,7 @@ export interface List {
 export interface Task {
   id: number;
   name: string;
+  order?: number;
   listId: number;
   assigned_users?: User[];
   due_date?: string;
@@ -21,10 +23,12 @@ export interface Workspace {
   id?: number;
   name: string;
   userId: number;
+  lists?: List[];
   assigned_users?: User[];
   updatedAt?: Date;
   files?: File;
   description?: string;
+  showSettings?: boolean;
 }
 
 export interface Files {

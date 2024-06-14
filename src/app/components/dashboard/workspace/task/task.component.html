@@ -9,7 +9,7 @@
 >
   <h4 class="title">{{ this.task.name }}</h4>
   <i
-    *ngIf="this.onFocus"
+    *ngIf="permissions.canDelete && this.onFocus"
     class="fa-solid fa-trash"
     (click)="deleteTask(); $event.stopPropagation()"
   ></i>

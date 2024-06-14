@@ -1,6 +1,6 @@
 <div class="wrapper full-height full-width full-center">
   <div class="content column full-center">
-    <div class="edit">
+    <div #content class="edit">
       <div class="name row gap-1 align-center full-width">
         <i class="fa-solid fa-signature"></i>
         <div class="header">
@@ -13,21 +13,10 @@
             class="input"
           >
             <input
+              *ngIf="permissions.canModify"
               #taskTitle
-              value="{{
-                !(
-                  this.editedTask.name === undefined ||
-                  this.editedTask.name.length === 0
-                )
-                  ? this.editedTask.name
-                  : ''
-              }}"
-              placeholder="{{
-                this.editedTask.name === undefined ||
-                this.editedTask.name.length === 0
-                  ? 'Añade un título'
-                  : ''
-              }}"
+              [(ngModel)]="this.editedTask.name"
+              placeholder="Añade un título"
               maxlength="70"
               (blur)="handleInputChange()"
               (keydown.enter)="handleInputChange()"
@@ -57,25 +46,24 @@
           >
             <textarea
               #taskDescription
+              *ngIf="permissions.canModify"
               placeholder="{{
                 this.editedTask.description === undefined ||
                 this.editedTask.description.length === 0
                   ? 'Añade una descripción'
                   : ''
               }}"
-              value="{{
-                !(
-                  this.editedTask.description === undefined ||
-                  this.editedTask.description.length === 0
-                )
-                  ? this.editedTask.description
-                  : ''
-              }}"
               (blur)="handleDescriptionChange()"
               (keydown.enter)="handleDescriptionChange()"
               (keydown.escape)="handleDescriptionChange()"
+              [(ngModel)]="this.editedTask.description"
             ></textarea>
-            <button>Hecho</button>
+            <button
+              *ngIf="permissions.canModify"
+              (click)="updateTask(); $event.preventDefault()"
+            >
+              Hecho
+            </button>
           </div>
           <div
             *ngIf="
@@ -90,26 +78,99 @@
             <p (click)="enterEditDescriptionMode()">
               {{ task.description }}
             </p>
-            <button (click)="enterEditDescriptionMode()">Editar</button>
+            <button
+              *ngIf="permissions.canModify"
+              (click)="enterEditDescriptionMode()"
+            >
+              Editar
+            </button>
           </div>
         </div>
       </div>
-      <div class="due_date column gap-1 justify-center full-width">
+      <div class="dueDate column gap-1 justify-center full-width">
         <div class="header row gap-1 align-center">
           <i class="fa-solid fa-calendar-days"></i>
           <h3>Fecha de vencimiento</h3>
         </div>
         <input
           #dateInput
+          [readOnly]="!permissions.canModify"
           type="date"
           min="{{ this.todayDate }}"
+          [(ngModel)]="editedTask.dueDate"
           (click)="$event.stopPropagation()"
-          value="{{ this.editedTask.due_date ?? '' }}"
-          (change)="this.editedTask.due_date = dateInput.value.toString()"
+          (change)="updateTask()"
         />
       </div>
       <div class="users column gap-1 align-center full-width">
-        To implement yet!!
+        <div class="header row gap-1 full-width align-center">
+          <i class="fa-solid fa-user-group"></i>
+          <h3>Colaboradores asignados</h3>
+        </div>
+        <div
+          *ngFor="let assignedUser of assignedUsers"
+          class="collaborator row space-between align-center p-1 full-width gap-1"
+        >
+          <i
+            *ngIf="permissions.canModify"
+            class="fa-solid fa-xmark clickable"
+            (click)="deleteUserTask(assignedUser)"
+          ></i>
+
+          <div class="user row gap-05 full-width align-center justify-left">
+            <img
+              src="{{ assignedUser.user.image?.contentUrl }}"
+              alt="Avatar of {{ assignedUser.user.username }}"
+            />
+            <span class="option-text">{{ assignedUser.user.username }}</span>
+          </div>
+        </div>
+        <div
+          *ngIf="permissions.canModify"
+          class="new_user row full-center full-width space-between gap-1"
+        >
+          <div
+            #selectMenu
+            class="select-menu full-width"
+            (click)="handleMenuClick(); $event.stopPropagation()"
+          >
+            <div class="select-btn gap-1" (click)="handleSelectBtnClick()">
+              <span *ngIf="!isInputShowed" class="sBtn-text">{{
+                "Escoge un usuario"
+              }}</span>
+              <input
+                #selectInput
+                *ngIf="isInputShowed"
+                type="text"
+                class="sBtn-text full-width"
+                placeholder="Escoge un usuario"
+                (keyup)="searchOnSelect($event); $event.stopPropagation()"
+                (keyup.enter)="
+                  addUserTask(filteredPotentialUsers[0]);
+                  searchSelectTerms.next('')
+                "
+                (click)="$event.stopPropagation()"
+              />
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <ul class="list_users options column full-center gap-05">
+              <li
+                *ngFor="let potentialUser of filteredPotentialUsers"
+                id="{{ potentialUser.user.id }}"
+                class="user option row space-between align-center p-1 full-width"
+                (click)="addUserTask(potentialUser)"
+              >
+                <img
+                  src="{{ potentialUser.user.image?.contentUrl }}"
+                  alt="Avatar of {{ potentialUser.user.username }}"
+                />
+                <span class="option-text">{{
+                  potentialUser.user.username
+                }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       <div class="files_section column gap-1 justify-center full-width">
         <div class="header row gap-1 align-center">
@@ -137,7 +198,9 @@
           (click)="$event.stopPropagation()"
         />
         <div class="full-center">
-          <button (click)="imageInput.click()">Adjuntar un archivo</button>
+          <button *ngIf="permissions.canModify" (click)="imageInput.click()">
+            Adjuntar un archivo
+          </button>
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ import { firstValueFrom } from 'rxjs';
 export class WorkspacesComponent implements OnInit {
   public user?: User;
   public workspaces?: Workspace[];
+  public collaboratingWorkspaces?: Workspace[];
   public isAddWorkspaceClicked: boolean = false;
   public static isOverlayOn: boolean = false;
   public isModalOpen: boolean = false;
@@ -39,7 +40,15 @@ export class WorkspacesComponent implements OnInit {
 
     this.user = await firstValueFrom(this.userData.user$);
     this.workspaces = await firstValueFrom(this.userData.workspaces$);
+    this.collaboratingWorkspaces = await firstValueFrom(
+      this.userData.collaboratingWorkspaces$
+    );
 
+    this.userData.collaboratingWorkspaces$.subscribe(
+      (cWorkspaces: Workspace[]) => {
+        this.collaboratingWorkspaces = cWorkspaces;
+      }
+    );
     this.userData.user$.subscribe((user) => {
       this.user = user;
     });

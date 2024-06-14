@@ -1,6 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { CountriesAPIService } from 'src/app/shared/services/countries/countries.service';
 import { UsersService } from 'src/app/shared/services/flowboard/users/users.service';
 import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
@@ -25,50 +36,70 @@ export class MyAccountComponent implements OnInit {
   @ViewChild('imageInput') imageInput: any;
   @ViewChild('avatar') avatar: any;
 
-  public signUpForm?: FormGroup;
-  private data?: User;
+  public form?: FormGroup;
+  public user?: User;
+  public beforeSavingUser?: User;
   public image?: Files;
   public location: { countries: Country[]; states: State[] } = {
     countries: [],
     states: [],
   };
-  public countrySelected: string = 'AF';
-  public stateSelected: string = 'BDS';
+  public countrySelected: BehaviorSubject<number> = new BehaviorSubject<number>(
+    10
+  );
 
   constructor(
-    private formBuilder: FormBuilder,
     private countriesService: CountriesAPIService,
     private userData: UserDataService,
     private usersService: UsersService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.data = await firstValueFrom(this.userData.user$);
+    this.user = await firstValueFrom(this.userData.user$);
+    this.beforeSavingUser = JSON.parse(JSON.stringify(this.user));
 
-    this.signUpForm = this.formBuilder.group({
-      password: ['', [Validators.required, PasswordValidator(passwordLength)]],
-      confirmPassword: [
-        '',
-        [Validators.required, PasswordValidator(passwordLength)],
-      ],
-      email: [
-        this.data.email,
+    this.form = new FormGroup({
+      password: new FormControl('', [
+        Validators.required,
+        PasswordValidator(passwordLength),
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        PasswordValidator(passwordLength),
+      ]),
+
+      email: new FormControl(
+        this.user.email,
         [Validators.required, Validators.email],
-        [EmailAsyncValidator(this.usersService)],
-      ],
-      username: [
-        this.data.username,
+        [EmailAsyncValidator(this.usersService)]
+      ),
+      username: new FormControl(
+        this.user.username,
         [Validators.required],
-        [UsernameAsyncValidator(this.usersService)],
-      ],
-      address: [this.data.address, [Validators.required]],
-      phone: [
-        this.data.phone,
-        [Validators.required, Validators.pattern(phoneValidPattern)], //returns 'pattern' property validation error
-      ],
-      country: ['', Validators.required],
-      state: ['', Validators.required],
-      city: ['', Validators.required],
+        [UsernameAsyncValidator(this.usersService)]
+      ),
+
+      address: new FormControl(this.user.address, [Validators.required]),
+      phone: new FormControl(
+        this.user.phone,
+        [Validators.required, Validators.pattern(phoneValidPattern)] //returns 'pattern' property validation error
+      ),
+      country: new FormControl('', Validators.required),
+      state: new FormControl('', Validators.required),
+    });
+
+    this.location.countries = await firstValueFrom(
+      this.countriesService.getCountries()
+    );
+    this.countrySelected.next(
+      this.location.countries.findIndex((c) => c.iso2 === this.user?.country)
+    );
+    this.countrySelected.subscribe(async (selectedCountry) => {
+      this.location.states = await firstValueFrom(
+        this.countriesService.getStates(
+          this.location.countries[selectedCountry].iso2
+        )
+      );
     });
   }
 
@@ -94,25 +125,10 @@ export class MyAccountComponent implements OnInit {
     //read and show image to UI
   }
 
-  updateCountry(event: any): string {
+  onCountryChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
-    this.countrySelected = selectElement.value;
-    return this.countrySelected;
+    this.countrySelected.next(selectElement.selectedIndex);
   }
-
-  updateStates() {
-    this.countriesService.getStates(this.countrySelected).subscribe(
-      (states: State[]) => {
-        this.location.states = states.sort((a, b) =>
-          a.name.localeCompare(b.name)
-        );
-      },
-      (error) => {
-        console.error('Error fetching states: ', error);
-      }
-    );
-  }
-  //countriesAPI
 
   showError() {}
 }

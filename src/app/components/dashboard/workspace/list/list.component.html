@@ -8,13 +8,14 @@
   <div class="headlines row space-between full-width align-center">
     <h3 class="title">{{ this.list.name }}</h3>
     <i
-      *ngIf="this.onFocus"
+      *ngIf="permissions.canDelete && this.onFocus"
       class="fa-solid fa-trash"
       (click)="deleteList(); $event.stopPropagation()"
     ></i>
   </div>
   <div class="inner gap-05 column">
     <div
+      *ngIf="permissions.canModify"
       class="add_task {{
         !this.isAddTaskClicked ? 'clickable' : 'not_clickable'
       }}"
@@ -71,6 +72,7 @@
       <app-task
         *ngFor="let task of this.list.tasks"
         cdkDrag
+        [permissions]="permissions"
         [cdkDragPreviewContainer]="previewContainer"
         [task]="task"
         class="task"

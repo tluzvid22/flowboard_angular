@@ -1,4 +1,4 @@
-import { Workspace } from './workspaces';
+import { Task, Workspace } from './workspaces';
 
 export interface User {
   id?: number;
@@ -18,11 +18,19 @@ export interface User {
   isFriend?: boolean;
   requestedBeFriend?: boolean;
   wantsToBeFriend?: boolean;
+  collaborations?: Collaborator[];
 }
 
 export interface Friend {
   userId: number;
   user: User;
+}
+
+export interface UserTask {
+  userId: number;
+  taskId: number;
+  user: User;
+  task: Task;
 }
 
 export interface Collaborator {

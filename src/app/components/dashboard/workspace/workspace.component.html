@@ -13,10 +13,12 @@
       *ngFor="let list of this.workspace?.lists"
       cdkDrag
       [list]="list"
+      [permissions]="permissions"
       [cdkDragPreviewContainer]="previewContainer"
       [connectedLists]="getConnectedLists(list.id!)"
     ></app-list>
     <div
+      *ngIf="permissions?.canModify"
       class="add_list full-center {{
         !this.isAddListClicked ? 'clickable' : ''
       }}"

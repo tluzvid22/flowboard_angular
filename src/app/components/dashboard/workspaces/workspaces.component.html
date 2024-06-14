@@ -20,9 +20,31 @@
         [relativeTo]="this.activatedRoute"
         class="centerWrapper"
       >
-        <!-- [routerLink]="['./workspace', workspace.id, 'edit']" -->
         <div class="center">
           <i class="fa-solid fa-gear settings full-center"></i>
+        </div>
+      </div>
+    </li>
+
+    <li
+      *ngFor="let workspace of collaboratingWorkspaces; let i = index"
+      class="workspace clickable full-center"
+      [ngClass]="i % 2 === 0 ? 'blue' : 'purple'"
+    >
+      <div
+        class="full-width full-height full-center"
+        [routerLink]="['./workspace', workspace.id]"
+        [relativeTo]="this.activatedRoute"
+      >
+        {{ workspace.name }}
+      </div>
+      <div
+        [routerLink]="[workspace.id, 'edit']"
+        [relativeTo]="this.activatedRoute"
+        class="centerWrapper"
+      >
+        <div class="center">
+          <i class="fa-solid fa-user-group"></i>
         </div>
       </div>
     </li>

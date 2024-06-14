@@ -20,14 +20,7 @@ export class ApiService {
     return this.httpClient.put<T>(url, body, options) as Observable<T>;
   }
 
-  delete<T>(url: string, options: any, body?: any): Observable<T> {
-    console.log({
-      ...options,
-      body,
-    });
-    return this.httpClient.delete<T>(url, {
-      ...options,
-      body,
-    }) as Observable<T>;
+  delete<T>(url: string, options: any): Observable<T> {
+    return this.httpClient.delete<T>(url, options) as Observable<T>;
   }
 }

@@ -24,6 +24,12 @@ import { Router } from '@angular/router';
 })
 export class ListComponent implements OnInit {
   @Input({ required: true }) connectedLists: string[] = [];
+  @Input({ required: true }) permissions: {
+    isAdmin: boolean;
+    canDelete: boolean;
+    canModify: boolean;
+    canRead: boolean;
+  } = { isAdmin: true, canDelete: true, canModify: true, canRead: true };
   @Input({ required: true }) list: List = {
     name: '',
     workspaceId: 1,
@@ -96,6 +102,7 @@ export class ListComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<Task[] | undefined>) {
+    if (!this.permissions?.canModify) return;
     const previousIndex = event.previousIndex;
     const currentIndex = event.currentIndex;
     const containerData = event.container.data;
@@ -136,6 +143,7 @@ export class ListComponent implements OnInit {
         name: taskTitle,
         listId: this.list.id as number,
         files: [],
+        dueDate: '',
       })
       .subscribe(
         (response: Task) => {

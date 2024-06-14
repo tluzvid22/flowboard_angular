@@ -37,6 +37,9 @@ export const environment = {
       friend: {
         friend: '/Friend',
       },
+      userTasks: {
+        userTasks: '/UserTasks',
+      },
       request: {
         request: '/Request',
       },
@@ -55,6 +58,7 @@ export const environment = {
       workspace: {
         workspace: '/Workspace',
         workspacesByUser: '/Workspace/user/',
+        collaboratingWorkspaces: '/Workspace/CollaboratingWorkspaces/user',
       },
       collaborator: {
         collaborator: '/Collaborator',

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { OverviewComponent } from './overview/overview.component';
 import { RouterModule, Routes } from '@angular/router';
 import { WorkspacesComponent } from './workspaces/workspaces.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
@@ -15,13 +14,13 @@ import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { DeleteConfirmationComponent } from './delete-confirmation/delete-confirmation.component';
 import { EditWorkspaceComponent } from './workspace/editworkspace/editworkspace.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { BrowserModule } from '@angular/platform-browser';
 
 const routes: Routes = [
   {
     path: '',
     component: DashboardComponent,
     children: [
-      { path: 'overview', component: OverviewComponent },
       {
         path: 'workspaces',
         component: WorkspacesComponent,
@@ -51,7 +50,6 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     DashboardComponent,
-    OverviewComponent,
     WorkspacesComponent,
     WorkspaceComponent,
     MyAccountComponent,

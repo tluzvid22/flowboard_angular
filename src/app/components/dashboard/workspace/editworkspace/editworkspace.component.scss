@@ -65,6 +65,15 @@
       }
     }
 
+    .checkboxs {
+      .checkbox {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+    }
+
     .select-menu {
       position: relative;
 
@@ -113,15 +122,6 @@
 
     .select-menu.active .select-btn i {
       transform: rotate(-180deg);
-    }
-
-    .checkboxs {
-      .checkbox {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        gap: 0.5rem;
-      }
     }
 
     .select-menu .options {

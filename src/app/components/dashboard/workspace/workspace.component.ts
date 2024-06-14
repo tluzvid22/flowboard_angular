@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -7,6 +7,7 @@ import { WorkspacesService } from 'src/app/shared/services/flowboard/workspaces/
 import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
 import { List, Workspace } from 'src/app/shared/types/workspaces';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Collaborator, User } from 'src/app/shared/types/user';
 
 @Component({
   selector: 'app-workspace',
@@ -15,8 +16,15 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 })
 export class WorkspaceComponent implements OnInit {
   public workspace?: Workspace;
+  public user?: User;
   public isAddListClicked: boolean = false;
   public static isOverlayOn: boolean;
+  public permissions: {
+    isAdmin: boolean;
+    canDelete: boolean;
+    canModify: boolean;
+    canRead: boolean;
+  } = { isAdmin: true, canDelete: true, canModify: true, canRead: true };
   private loginCookies?: string;
   @ViewChild('preview') previewContainer!: ElementRef;
 
@@ -53,28 +61,54 @@ export class WorkspaceComponent implements OnInit {
       }
     );
     //workspace delete handle
+
+    this.userData.selectedWorkspace$.subscribe((response: Workspace[]) => {
+      this.workspace = response[0];
+      this.getPermissions();
+    });
+    //getworkspace
+
+    this.userData.user$.subscribe((user) => {
+      this.user = user;
+      this.getPermissions();
+    });
+  }
+
+  getPermissions() {
+    this.permissions = {
+      isAdmin: true,
+      canDelete: true,
+      canModify: true,
+      canRead: true,
+    };
+    const collaboration = this.user?.collaborations?.find(
+      (c) => c.workspaceId === this.workspace?.id
+    );
+    if (collaboration)
+      this.permissions = {
+        isAdmin: collaboration.isAdmin ?? false,
+        canDelete: collaboration.canDelete ?? false,
+        canModify: collaboration.canModify ?? false,
+        canRead: collaboration.canRead ?? false,
+      };
+    this.userData.setPermissionsOnSelectedWorkspace(this.permissions);
+  }
+
+  async ngOnInit(): Promise<void> {
+    await this.userData.whenInitialized();
     this.activatedRoute.params.subscribe((params) => {
       const newId = params['id'];
       if (newId) this.userData.setSelectedWorkspaceByWorkspaces(newId);
     });
     //to reload component when route changed to other workspace
-  }
-
-  async ngOnInit(): Promise<void> {
-    await this.userData.whenInitialized();
 
     this.loginCookies = await firstValueFrom(this.userData.loginCookies$);
-    const workspace_id = this.activatedRoute.snapshot.params['id'];
-
-    //console.log(await firstValueFrom(this.userData.workspaces$));
 
     this.workspace = (
       await firstValueFrom(this.userData.selectedWorkspace$)
     )[0];
-    this.userData.selectedWorkspace$.subscribe((response: Workspace[]) => {
-      this.workspace = response[0];
-    });
-    //getworkspace
+    this.user = await firstValueFrom(this.userData.user$);
+
     if (!this.workspace) {
       const actualUrl = this.router.url.split('/');
       const workspacesUrl = actualUrl.splice(0, actualUrl.length - 2).join('/');
@@ -140,6 +174,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<List[]>) {
+    if (!this.permissions?.canModify) return;
     const previousIndex = event.previousIndex;
     const currentIndex = event.currentIndex;
     const containerData = event.container.data;
@@ -152,7 +187,7 @@ export class WorkspaceComponent implements OnInit {
     };
 
     /*const response =*/
-    firstValueFrom(this.workspacesAPI.putList(updatedList));
+    this.workspacesAPI.putList(updatedList).subscribe();
   }
 
   public getIsOverlayOn() {

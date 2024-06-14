@@ -25,6 +25,123 @@
       border-radius: 3px;
     }
 
+    .sBtn-text {
+      font-size: 18px;
+      font-family: "Inter", "Roboto", system-ui;
+    }
+
+    .select-menu {
+      position: relative;
+
+      ::-webkit-scrollbar {
+        background-color: $white;
+        border-radius: 20px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: rgba(28, 28, 28, 0.2);
+        border-radius: 20px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(28, 28, 28, 0.3);
+      }
+
+      .select-btn {
+        display: flex;
+        height: 3rem;
+        background-color: $white;
+        padding: 0 20px;
+        font-size: 18px;
+        font-weight: 400;
+        border-radius: 8px;
+        align-items: center;
+        cursor: pointer;
+        justify-content: space-between;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        color: $black;
+      }
+
+      input {
+        outline: none;
+        border: none;
+      }
+
+      ::placeholder {
+        color: $black;
+      }
+    }
+
+    .select-btn i {
+      font-size: 16px;
+      transition: 0.3s;
+      color: $black;
+    }
+
+    .select-menu.active .select-btn i {
+      transform: rotate(-180deg);
+    }
+
+    .select-menu .options {
+      position: fixed;
+      z-index: 5;
+
+      top: 0;
+      max-height: 9rem;
+      overflow-y: auto;
+      left: 0;
+      width: 100%;
+      margin-top: 5px;
+      border-radius: 8px;
+      color: $black;
+      background-color: $white;
+      box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .select-menu.active .options {
+      display: block;
+      opacity: 1;
+    }
+
+    .select-menu.active .options.overflow {
+      opacity: 0;
+    }
+
+    .options .option {
+      display: flex;
+      height: 3rem;
+      cursor: pointer;
+      padding: 0 1rem;
+      border-radius: 8px;
+      align-items: center;
+      background: #fff;
+    }
+
+    .options .option:hover {
+      background: #f2f2f2;
+    }
+
+    .option img {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 100%;
+    }
+
+    .collaborator {
+      .user {
+        font-size: 18px;
+      }
+      img {
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 100%;
+      }
+    }
+
+    button:disabled {
+      background-color: $primary_10;
+      cursor: default;
+    }
+
     .edit {
       width: 97%;
       height: 97%;
@@ -87,6 +204,7 @@
         }
         .disclaimer {
           position: absolute;
+          z-index: 3;
           bottom: 0;
           font-size: 10px;
           color: red;

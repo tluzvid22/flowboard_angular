@@ -58,35 +58,12 @@
                   {{ favorite.linkedTo }}
                 </label>
               </li>
-              <!-- <li class="navElement row align-center gap-05">
-                <label>Overview</label>
-              </li>
-              <li class="navElement row align-center gap-05">
-                <label>Espacios de trabajo</label>
-              </li> -->
             </ul>
           </div>
 
           <div class="general">
             <label class="title">General</label>
             <ul>
-              <li
-                class="navElement overview row align-center gap-05"
-                routerLink="overview"
-              >
-                <div class="logo">
-                  <img
-                    class="icon"
-                    [src]="
-                      this.isDarkModeOn
-                        ? '/assets/icons/dashboard/dark/overview.svg'
-                        : '/assets/icons/dashboard/light/overview.svg'
-                    "
-                    alt="Overview Logo"
-                  />
-                </div>
-                <label class="clickable">Overview</label>
-              </li>
               <li
                 class="navElement workspaces row align-center gap-05"
                 routerLink="workspaces"
@@ -187,6 +164,17 @@
           alt="Sidebar icon"
         />
         <img
+          *ngIf="this.isWorkspaceSelected"
+          class="icon"
+          [src]="
+            this.isDarkModeOn
+              ? '/assets/icons/dashboard/dark/group.svg'
+              : '/assets/icons/dashboard/light/group.svg'
+          "
+          [routerLink]="[router.url, 'edit']"
+          alt="Collaborators icon"
+        />
+        <img
           class="icon"
           [src]="
             this.isDarkModeOn
@@ -256,7 +244,7 @@
       <div class="nav column space-between align-left">
         <div class="notifications">
           <label>Notificaciones</label>
-          <ul>
+          <!-- <ul>
             <li class="notification">
               <img class="icon img_notification_type" />
               <div class="info">
@@ -285,10 +273,10 @@
                 <p class="date">Just now</p>
               </div>
             </li>
-          </ul>
+          </ul> -->
         </div>
 
-        <div class="tasks">
+        <!-- <div class="tasks">
           <label>Tareas</label>
 
           <ul>
@@ -356,7 +344,7 @@
               </div>
             </li>
           </ul>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, firstValueFrom } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { DeleteConfirmationEventsService } from 'src/app/shared/services/delete-confirmation-events/delete-confirmation-events.service';
 import { UserDataService } from 'src/app/shared/services/userData/user-data.service';
 import { User } from 'src/app/shared/types/user';
@@ -24,7 +25,9 @@ export class DashboardComponent implements AfterViewInit {
   public isSidebarRightVisible: boolean = true;
   public user?: User;
   public workspaces: Workspace[] = [];
+  public selectedItem: string = '';
   public isWorkspaceAbleToDelete: boolean = true;
+  public isWorkspaceSelected: boolean = true;
   public initialized: Promise<void>;
   public isLogOutTabVisible: boolean = false;
   public favorites: { linkedTo: string; redirectTo: string }[] = [];
@@ -138,7 +141,12 @@ export class DashboardComponent implements AfterViewInit {
 
     this.loginCookies = await firstValueFrom(this.userData.loginCookies$);
     this.user = await firstValueFrom(this.userData.user$);
-    this.workspaces = await firstValueFrom(this.userData.workspaces$);
+
+    const workspaces = await firstValueFrom(this.userData.workspaces$);
+    const collaboratingWorkspaces = await firstValueFrom(
+      this.userData.collaboratingWorkspaces$
+    );
+    this.workspaces = [...workspaces, ...collaboratingWorkspaces];
 
     this.userData.loginCookies$.subscribe((cookies) => {
       this.loginCookies = cookies;
@@ -146,9 +154,39 @@ export class DashboardComponent implements AfterViewInit {
     this.userData.user$.subscribe((user) => {
       this.user = user;
     });
-    this.userData.workspaces$.subscribe((workspaces) => {
-      this.workspaces = workspaces;
-    });
+  }
+
+  changeWorkspaceTitle(): boolean {
+    const route = this.router.url.split('/');
+    const workspaceIdIndex: number = route.indexOf('workspace');
+    const title = this.title.nativeElement as HTMLLabelElement;
+    this.cleanSelected();
+    //clean selected item from navbar
+
+    if (workspaceIdIndex !== -1) {
+      this.isWorkspaceAbleToDelete = false;
+      const workspaceId = +route[workspaceIdIndex + 1];
+      const workspaceName = this.workspaces.find(
+        (workspace) => workspace.id == workspaceId
+      )?.name;
+      //search for name and id
+
+      this.selectedItem = workspaceName ?? 'Workspace';
+
+      const permissions = this.user?.collaborations?.find(
+        (c) => c.workspaceId === workspaceId
+      );
+      if (!permissions || permissions!.isAdmin)
+        this.isWorkspaceAbleToDelete = true;
+      //gives delete possibility
+
+      this.isWorkspaceSelected = true;
+
+      title.textContent = this.selectedItem;
+      return true;
+      //change title if exists or default
+    }
+    return false;
   }
 
   private cleanSelected() {
@@ -172,6 +210,19 @@ export class DashboardComponent implements AfterViewInit {
       (this.profilePicture.nativeElement as HTMLImageElement).src =
         this.user.image.contentUrl;
 
+    this.userData.workspaces$.subscribe(async (workspaces) => {
+      const collaboratingWorkspaces = await firstValueFrom(
+        this.userData.collaboratingWorkspaces$
+      );
+      this.workspaces = [...workspaces, ...collaboratingWorkspaces];
+      this.changeWorkspaceTitle();
+    });
+    this.userData.collaboratingWorkspaces$.subscribe(async (workspaces) => {
+      const ownWorkspaces = await firstValueFrom(this.userData.workspaces$);
+      this.workspaces = [...workspaces, ...ownWorkspaces];
+      this.changeWorkspaceTitle();
+    });
+
     const favorites = localStorage.getItem('favorites');
     if (favorites)
       (JSON.parse(favorites) as []).forEach((favorite) =>
@@ -194,54 +245,42 @@ export class DashboardComponent implements AfterViewInit {
 
   private handleRouteChange(routestr: string) {
     const route = routestr.split('/');
-    const workspaceIdIndex: number = route.indexOf('workspace');
     const title = this.title.nativeElement as HTMLLabelElement;
 
-    this.cleanSelected();
-    //clean selected item from navbar
-    let selectedItem = '';
-
-    if (workspaceIdIndex !== -1) {
-      const workspaceId = +route[workspaceIdIndex + 1];
-      const workspaceName = this.workspaces.find(
-        (workspace) => workspace.id == workspaceId
-      )!.name;
-      //search for name and id
-
-      selectedItem = workspaceName;
-
-      this.isWorkspaceAbleToDelete = true;
-      //gives delete possibility
-
-      title.textContent = workspaceName ?? 'Workspace';
-      //change title if exists or default
-    } else if (route.indexOf('workspaces') !== -1) {
+    if (!this.changeWorkspaceTitle() && route.indexOf('workspaces') !== -1) {
       this.isWorkspaceAbleToDelete = false;
+      this.isWorkspaceSelected = false;
       title.textContent = 'Workspaces';
-      selectedItem = 'Workspaces';
+      this.selectedItem = 'Workspaces';
     } else if (route.indexOf('overview') !== -1) {
       this.isWorkspaceAbleToDelete = false;
+      this.isWorkspaceSelected = false;
       title.textContent = 'Overview';
-      selectedItem = 'Overview';
+      this.selectedItem = 'Overview';
     } else if (route.indexOf('social') !== -1) {
       this.isWorkspaceAbleToDelete = false;
+      this.isWorkspaceSelected = false;
       title.textContent = 'Social';
-      selectedItem = 'Social';
+      this.selectedItem = 'Social';
     } else if (route.indexOf('myaccount') !== -1) {
       this.isWorkspaceAbleToDelete = false;
+      this.isWorkspaceSelected = false;
       title.textContent = 'Mi cuenta';
-      selectedItem = 'Mi cuenta';
+      this.selectedItem = 'Mi cuenta';
     }
 
     Array.from(
       document.getElementsByClassName(
-        selectedItem.replace(' ', '').toLowerCase()
+        this.selectedItem.replace(' ', '').toLowerCase()
       )
     ).forEach((element) => {
       element.classList.add('nav_selected');
     });
 
-    this.selectedElement = { linkedTo: selectedItem, redirectTo: routestr };
+    this.selectedElement = {
+      linkedTo: this.selectedItem,
+      redirectTo: routestr,
+    };
     this.isElementSelectedInFavorites =
       this.favorites.findIndex(
         (favorite) => favorite.linkedTo === this.selectedElement.linkedTo

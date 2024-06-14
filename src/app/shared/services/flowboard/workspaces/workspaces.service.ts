@@ -3,7 +3,9 @@ import { environment } from 'environments/development';
 import { ApiService } from '../../api/api.service';
 import { Files, List, Task, Workspace } from 'src/app/shared/types/workspaces';
 import { Observable } from 'rxjs';
-import { Collaborator } from 'src/app/shared/types/user';
+import { Collaborator, UserTask } from 'src/app/shared/types/user';
+import { stringify } from 'querystring';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +13,7 @@ import { Collaborator } from 'src/app/shared/types/user';
 export class WorkspacesService {
   private BASE_URL = environment.flowboardAPI.base_url;
   private WORKSPACE_ENDPOINT = environment.flowboardAPI.endpoints.workspace;
+  private USERTASK_ENDPOINT = environment.flowboardAPI.endpoints.userTasks;
   private COLLABORATOR_ENDPOINT =
     environment.flowboardAPI.endpoints.collaborator;
   private LIST_ENDPOINT = environment.flowboardAPI.endpoints.list;
@@ -79,7 +82,8 @@ export class WorkspacesService {
 
   public putTask(task: Task): Observable<Task> {
     const url = `${this.BASE_URL}${this.TASK_ENDPOINT.task}`;
-    return this.api.put(url, task, this.headers);
+    const date = new Date(task.dueDate).toJSON();
+    return this.api.put(url, { ...task, dueDate: date }, this.headers);
   }
 
   public getTasksByListId(list_id: number): Observable<Task[]> {
@@ -124,12 +128,12 @@ export class WorkspacesService {
     adminToken: string,
     collaborator: Collaborator
   ): Observable<Collaborator> {
+    const headers = new HttpHeaders()
+      .set('AdminId', String(adminId))
+      .set('AdminToken', adminToken);
+
     const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}`;
-    return this.api.post(
-      url,
-      { adminId, adminToken, ...collaborator },
-      this.headers
-    );
+    return this.api.post(url, collaborator, { headers });
   }
 
   public getCollaboratorsByWorkspaceAndUserId(
@@ -137,7 +141,25 @@ export class WorkspacesService {
     userId: number,
     token: string
   ): Observable<Collaborator[]> {
-    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}/${workspaceId}/${userId}/${token}`;
+    const headers = new HttpHeaders().set('UserToken', token);
+    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}/${userId}/${workspaceId}`;
+    return this.api.get(url, { headers });
+  }
+
+  public getCollaboratorsByUserId(
+    userId: number,
+    token: string
+  ): Observable<Collaborator[]> {
+    const headers = new HttpHeaders().set('UserToken', token);
+    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}/${userId}`;
+    return this.api.get(url, { headers });
+  }
+
+  public getCollaboratingWorkspacesByUserIdAndToken(
+    userId: number,
+    token: string
+  ): Observable<Workspace[]> {
+    const url = `${this.BASE_URL}${this.WORKSPACE_ENDPOINT.collaboratingWorkspaces}/${userId}/${token}`;
     return this.api.get(url, this.headers);
   }
 
@@ -147,19 +169,11 @@ export class WorkspacesService {
     userId: number,
     workspaceId: number
   ): Observable<boolean> {
-    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}`;
-    console.log({
-      adminId: adminId,
-      adminToken: adminToken,
-      userId: userId,
-      workspaceId: workspaceId,
-    });
-    return this.api.delete(url, this.headers, {
-      adminId: adminId,
-      adminToken: adminToken,
-      userId: userId,
-      workspaceId: workspaceId,
-    });
+    const headers = new HttpHeaders()
+      .set('AdminId', String(adminId))
+      .set('AdminToken', adminToken);
+    const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}/${userId}/${workspaceId}`;
+    return this.api.delete(url, { headers });
   }
 
   public updateCollaborator(
@@ -167,11 +181,25 @@ export class WorkspacesService {
     adminToken: string,
     collaborator: Collaborator
   ): Observable<Collaborator> {
+    const headers = new HttpHeaders()
+      .set('AdminId', String(adminId))
+      .set('AdminToken', adminToken);
     const url = `${this.BASE_URL}${this.COLLABORATOR_ENDPOINT.collaborator}`;
-    return this.api.put(
-      url,
-      { adminId, adminToken, ...collaborator },
-      this.headers
-    );
+    return this.api.put(url, collaborator, { headers });
+  }
+
+  public postUserTask(userTask: UserTask): Observable<UserTask> {
+    const url = `${this.BASE_URL}${this.USERTASK_ENDPOINT.userTasks}`;
+    return this.api.post(url, userTask, this.headers);
+  }
+
+  public getUserTaskByTaskId(taskId: number): Observable<UserTask[]> {
+    const url = `${this.BASE_URL}${this.USERTASK_ENDPOINT.userTasks}/${taskId}`;
+    return this.api.get<UserTask[]>(url, this.headers);
+  }
+
+  public deleteUserTask(userId: number, taskId: number): Observable<boolean> {
+    const url = `${this.BASE_URL}${this.USERTASK_ENDPOINT.userTasks}/${userId}/${taskId}`;
+    return this.api.delete(url, this.headers);
   }
 }

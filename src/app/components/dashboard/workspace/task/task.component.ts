@@ -21,7 +21,14 @@ export class TaskComponent {
     name: 'task',
     listId: 1,
     files: [],
+    dueDate: '',
   };
+  @Input({ required: true }) permissions: {
+    isAdmin: boolean;
+    canDelete: boolean;
+    canModify: boolean;
+    canRead: boolean;
+  } = { isAdmin: true, canDelete: true, canModify: true, canRead: true };
   public onFocus: boolean = false;
   public deletedTask: boolean = false;
 

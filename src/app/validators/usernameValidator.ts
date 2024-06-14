@@ -15,14 +15,13 @@ export function UsernameAsyncValidator(
       return of(null);
     }
 
-    // Devolver una promesa que resuelva con los errores o null si no hay errores
     return service.getUsernameExists(username).pipe(
       map((response: boolean) => {
         return response ? { usernameExists: true } : null;
       }),
       catchError((error) => {
         console.log(error);
-        return of({ usernameExists: true }); // Manejar el error aquí
+        return of({ usernameExists: true });
       })
     );
   };

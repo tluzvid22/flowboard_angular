@@ -1,7 +1,4 @@
-<form
-  [formGroup]="signUpForm!"
-  class="wrapper column full-center full-width gap-05"
->
+<form [formGroup]="form!" class="wrapper column full-center full-width gap-1">
   <div class="headlines row align-center space-between full-width">
     <div class="text">
       <h2>Edita tu perfil</h2>
@@ -9,7 +6,7 @@
     <div class="profile_img">
       <img
         #avatar
-        src="/assets/img/defaultpicture.jpg"
+        [src]="this.user?.image?.contentUrl"
         alt="Default profile picture"
       />
       <i (click)="handleImageSubmit()" class="fa-solid fa-pen clickable"
@@ -27,8 +24,8 @@
     <div
       class="error"
       *ngIf="
-        signUpForm!.get('username')?.errors?.required &&
-        signUpForm!.get('username')?.touched
+        form!.get('username')?.errors?.required &&
+        form!.get('username')?.touched
       "
     >
       Este campo es requerido.
@@ -36,8 +33,9 @@
     <div
       class="error"
       *ngIf="
-        !signUpForm!.get('username')?.errors?.required &&
-        signUpForm!.get('username')?.errors?.usernameExists
+        this.beforeSavingUser?.username !== this.user?.username &&
+        !form!.get('username')?.errors?.required &&
+        form!.get('username')?.errors?.usernameExists
       "
     >
       El username ya existe
@@ -55,9 +53,9 @@
     <div
       class="error"
       *ngIf="
-        signUpForm?.get('email')?.touched &&
-        !signUpForm?.get('email')?.errors?.required &&
-        signUpForm?.get('email')?.errors?.email
+        form?.get('email')?.touched &&
+        !form?.get('email')?.errors?.required &&
+        form?.get('email')?.errors?.email
       "
     >
       El correo electrónico debe ser valido
@@ -65,11 +63,9 @@
     <div
       class="error"
       *ngIf="
-        signUpForm?.get('email')?.touched &&
-        signUpForm?.get('confirmEmail')?.touched &&
-        !signUpForm?.get('email')?.errors?.email &&
-        (signUpForm?.get('email')?.errors?.required ||
-          signUpForm?.get('confirmEmail')?.errors?.required)
+        form?.get('email')?.touched &&
+        !form?.get('email')?.errors?.email &&
+        form?.get('email')?.errors?.required
       "
     >
       Campos requeridos
@@ -77,14 +73,10 @@
     <div
       class="error"
       *ngIf="
-        (!(
-          signUpForm?.get('email')?.errors?.required ||
-          signUpForm?.get('confirmEmail')?.errors?.required
-        ) &&
-          !signUpForm?.get('email')?.errors?.email &&
-          !signUpForm?.get('email')?.errors?.differentEmails &&
-          signUpForm?.get('email')?.errors?.emailExists) ||
-        signUpForm?.get('confirmEmail')?.errors?.emailExists
+        this.beforeSavingUser?.email !== this.user?.email &&
+        form?.get('email')?.errors?.required &&
+        !form?.get('email')?.errors?.email &&
+        form?.get('email')?.errors?.emailExists
       "
     >
       El correo electronico ya existe
@@ -102,10 +94,7 @@
   <div class="input-container">
     <div
       class="error"
-      *ngIf="
-        signUpForm!.get('address')?.invalid &&
-        signUpForm!.get('address')?.touched
-      "
+      *ngIf="form!.get('address')?.invalid && form!.get('address')?.touched"
     >
       Este campo es requerido.
     </div>
@@ -122,8 +111,7 @@
     <div
       class="error"
       *ngIf="
-        signUpForm!.get('phone')?.errors?.required &&
-        signUpForm!.get('phone')?.touched
+        form!.get('phone')?.errors?.required && form!.get('phone')?.touched
       "
     >
       Este campo es requerido.
@@ -131,9 +119,9 @@
     <div
       class="error"
       *ngIf="
-        !signUpForm!.get('phone')?.errors?.required &&
-        signUpForm!.get('phone')?.touched &&
-        signUpForm!.get('phone')?.errors?.pattern
+        !form!.get('phone')?.errors?.required &&
+        form!.get('phone')?.touched &&
+        form!.get('phone')?.errors?.pattern
       "
     >
       El número de teléfono debe ser válido
@@ -153,7 +141,7 @@
       #countrySelect
       id="country"
       formControlName="country"
-      (change)="updateCountry($event); updateStates()"
+      (change)="onCountryChange($event)"
     >
       <option
         *ngFor="let country of this.location.countries"
@@ -174,4 +162,7 @@
     </select>
   </div>
   <!-- State input -->
+  <div class="buttons full-width row justify-right gap-1">
+    <button type="submit">Hecho</button>
+  </div>
 </form>

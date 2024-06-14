@@ -9,6 +9,7 @@
       class="collaborator row space-between align-center p-1 full-width gap-1"
     >
       <i
+        *ngIf="!workspace?.collaborating"
         class="fa-solid fa-xmark clickable"
         (click)="deleteUser(collaborator)"
       ></i>
@@ -21,6 +22,7 @@
         <span class="option-text">{{ collaborator.user.username }}</span>
       </div>
       <div
+        *ngIf="!workspace?.collaborating"
         class="checkboxs full-width column"
         (click)="$event.stopPropagation()"
       >
@@ -39,7 +41,7 @@
       </div>
     </div>
     <div
-      *ngIf="showNewUser"
+      *ngIf="!workspace?.collaborating && showNewUser"
       class="new_user row full-center full-width space-between gap-1"
     >
       <div
@@ -56,9 +58,7 @@
             *ngIf="isInputShowed"
             type="text"
             class="sBtn-text full-width"
-            value="{{ searchSelectTerms.value }}"
             placeholder="Escoge un usuario"
-            [(ngModel)]="searchSelectTerms.value"
             (keyup.enter)="
               addCollaborator(filteredPotentialCollaborators[0]);
               searchSelectTerms.next('')
@@ -87,14 +87,17 @@
       </div>
     </div>
     <div
-      *ngIf="!showNewUser"
+      *ngIf="!workspace?.collaborating && !showNewUser"
       class="add_user clickable row full-center gap-1"
       (click)="showNewUser = true; $event.stopPropagation()"
     >
       <h4>Invita a un nuevo colaborador</h4>
       <i class="fa-solid fa-plus"></i>
     </div>
-    <div class="buttons row full-width align-center justify-right gap-1">
+    <div
+      *ngIf="!workspace?.collaborating"
+      class="buttons row full-width align-center justify-right gap-1"
+    >
       <button (click)="saveChanges()" [disabled]="canSave()">Guardar</button>
       <button (click)="leave()">Salir</button>
     </div>

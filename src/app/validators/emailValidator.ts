@@ -13,14 +13,13 @@ export function EmailAsyncValidator(service: UsersService): AsyncValidatorFn {
       return of(null);
     }
 
-    // Devolver una promesa que resuelva con los errores o null si no hay errores
     return service.getEmailExists(email).pipe(
       map((response: boolean) => {
         return response ? { emailExists: true } : null;
       }),
       catchError((error) => {
         console.log(error);
-        return of({ emailExists: true }); // Manejar el error aquí
+        return of({ emailExists: true });
       })
     );
   };

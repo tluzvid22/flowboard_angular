@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, model } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { UsersService } from 'src/app/shared/services/flowboard/users/users.service';
@@ -38,6 +38,13 @@ export class EditWorkspaceComponent implements OnInit {
     private activatedRoute: ActivatedRoute
   ) {
     this.workspaceId = this.activatedRoute.snapshot.params['id'];
+
+    if (!this.workspaceId) {
+      const routerUrlSplitted = this.router.url.split('/');
+      const workspaceIdIndex = routerUrlSplitted.indexOf('edit') - 1;
+      this.workspaceId = +routerUrlSplitted[workspaceIdIndex];
+    }
+
     this.userData.setSelectedWorkspaceByWorkspaces(this.workspaceId);
 
     if (this.collaborators.length == 0) this.showNewUser = true;
@@ -64,16 +71,29 @@ export class EditWorkspaceComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    await this.userData.whenInitialized();
+
     this.user = await firstValueFrom(this.userData.user$);
     this.workspace = (
       await firstValueFrom(this.userData.selectedWorkspace$)
     )[0];
     //workspace and user
 
+    this.userData.collaboratingWorkspaces$.subscribe((cw) => {
+      this.userData.setSelectedWorkspaceByWorkspaces(this.workspaceId);
+    });
+    this.userData.workspaces$.subscribe((w) => {
+      this.userData.setSelectedWorkspaceByWorkspaces(this.workspaceId);
+    });
+    this.userData.selectedWorkspace$.subscribe((sw: Workspace[]) => {
+      this.workspace = sw[0];
+    });
+    //to change selected workspace when changes on workspace are made
+
     this.loginCookies = await firstValueFrom(this.userData.loginCookies$);
     this.collaborators = await firstValueFrom(
       this.workspacesAPI.getCollaboratorsByWorkspaceAndUserId(
-        this.workspace.id!,
+        this.workspaceId,
         this.user.id!,
         this.loginCookies
       )
@@ -226,15 +246,19 @@ export class EditWorkspaceComponent implements OnInit {
     });
     //modify
     changes.deletedCollaborators.forEach((dc) => {
-      this.workspacesAPI.deleteCollaboratorByWorkspaceAndUserId(
-        this.user?.id!,
-        this.loginCookies,
-        dc.userId,
-        dc.workspaceId!
-      );
+      this.workspacesAPI
+        .deleteCollaboratorByWorkspaceAndUserId(
+          this.user?.id!,
+          this.loginCookies,
+          dc.userId,
+          dc.workspaceId!
+        )
+        .subscribe();
     });
     //delete
-    this.beforeSaveCollaborators = this.collaborators;
+    this.beforeSaveCollaborators = JSON.parse(
+      JSON.stringify(this.collaborators)
+    );
   }
 
   searchOnSelect(event: Event) {

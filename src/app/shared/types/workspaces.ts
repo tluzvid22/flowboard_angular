@@ -1,4 +1,4 @@
-import { User } from './user';
+import { User, Collaborator } from './user';
 
 export interface List {
   id?: number;
@@ -14,7 +14,7 @@ export interface Task {
   order?: number;
   listId: number;
   assigned_users?: User[];
-  due_date?: string;
+  dueDate: string;
   files: Files[];
   description?: string;
 }
@@ -29,6 +29,7 @@ export interface Workspace {
   files?: File;
   description?: string;
   showSettings?: boolean;
+  collaborating?: boolean;
 }
 
 export interface Files {
